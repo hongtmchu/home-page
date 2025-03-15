@@ -29,12 +29,12 @@ bibliography: files/bib/references.bib
 csl: files/bib/chicago-author-date.csl
 
 # Metadata stuff
-pagetitle: "{{< meta title >}} | Andrew Heiss"
-author-meta: "Andrew Heiss"
+pagetitle: "{{< meta title >}} | Hong T.M. Chu"
+author-meta: "Hong T.M. Chu"
 
 website:
-  title: "Andrew Heiss"
-  description: "Andrew Heiss is an assistant professor at Georgia State University, researching international NGOs and teaching data science & economics."
+  title: "Hong T.M. Chu"
+  description: "Andrew Heiss is an Assistant Professor at VinUniversity."
   favicon: "/files/favicon-512.png"
   site-url: "https://www.andrewheiss.com"
   repo-url: "https://github.com/andrewheiss/ath-quarto"
@@ -59,52 +59,52 @@ website:
         href: "index.qmd"
       - text: "CV"
         href: "cv/index.qmd"
-      - text: "Blog"
-        file: blog/index.qmd
+      # - text: "Blog"
+      #   file: blog/index.qmd
       - text: "Research"
         file: research/index.qmd
       - text: "Teaching"
         href: "teaching/index.qmd"
-      - text: "Talks"
-        href: "talks/index.qmd"
-      - text: "Now"
-        href: now/index.qmd
-      - text: "Uses"
-        file: uses/index.qmd
+      # - text: "Talks"
+      #   href: "talks/index.qmd"
+      # - text: "Now"
+      #   href: now/index.qmd
+      # - text: "Uses"
+      #   file: uses/index.qmd
     
     right:
-      - text: "{{< iconify bi rss size=1.1em title='RSS' >}}"
-        href: atom.xml
+      # - text: "{{< iconify bi rss size=1.1em title='RSS' >}}"
+      #   href: atom.xml
       - text: "{{< iconify bi envelope size=1.1em title='E-mail' >}}"
-        href: "mailto:aheiss@gsu.edu"
-      - text: "{{< iconify fa6-brands bluesky size=1.1em title='Bluesky' >}}"
-        href: https://bsky.app/profile/andrew.heiss.phd
-        rel: me
-      - text: "{{< iconify bi mastodon size=1.1em title='Mastodon' >}}"
-        href: https://fediscience.org/users/andrew/
-        rel: me
+        href: "mailto:hong.ctm@vinuni.edu.vn"
+      # - text: "{{< iconify fa6-brands bluesky size=1.1em title='Bluesky' >}}"
+      #   href: https://bsky.app/profile/andrew.heiss.phd
+      #   rel: me
+      # - text: "{{< iconify bi mastodon size=1.1em title='Mastodon' >}}"
+      #   href: https://fediscience.org/users/andrew/
+      #   rel: me
       - text: "{{< iconify bi github size=1.1em title='GitHub' >}}"
         href: https://github.com/andrewheiss
         rel: me
-      - text: "{{< iconify bi youtube size=1.1em title='YouTube' >}}"
-        href: https://www.youtube.com/andrewheiss
-        rel: me
-      - text: "{{< iconify fa6-brands blogger size=1.15em title='Blogger' >}}"
-        href: https://www.heissatopia.com/
+      # - text: "{{< iconify bi youtube size=1.1em title='YouTube' >}}"
+      #   href: https://www.youtube.com/andrewheiss
+      #   rel: me
+      # - text: "{{< iconify fa6-brands blogger size=1.15em title='Blogger' >}}"
+      #   href: https://www.heissatopia.com/
       - text: "{{< iconify bi linkedin size=1.1em title='LinkedIn' >}}"
-        href: https://www.linkedin.com/in/andrewheiss
+        href: https://www.linkedin.com/in/hongtmchu
         rel: me
   
   page-footer:
-    left: |
-      <span class="faux-block">{{< fa brands creative-commons >}} {{< var years >}} Andrew Heiss</span>
-      <span class="faux-block">All content licensed under<br>[{{< fa brands creative-commons >}} {{< fa brands creative-commons-by >}} Creative Commons CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)</span>      
-    center: |
-      <span class="faux-block">{{< fa brands orcid >}} <strong>ORCID</strong> [{{< var orcid >}}](https://orcid.org/{{< var orcid >}})</span>
-      <span class="faux-block">{{< fa key >}} [PGP public key]({{< var pgp.key >}}) &emsp; {{< fa fingerprint >}} Fingerprint:</strong><br><span class="fingerprint">{{< var pgp.fingerprint >}}</span></span>
+    # left: |
+    #   <span class="faux-block">{{< fa brands creative-commons >}} {{< var years >}} Andrew Heiss</span>
+    #   <span class="faux-block">All content licensed under<br>[{{< fa brands creative-commons >}} {{< fa brands creative-commons-by >}} Creative Commons CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)</span>      
+    # center: |
+    #   <span class="faux-block">{{< fa brands orcid >}} <strong>ORCID</strong> [{{< var orcid >}}](https://orcid.org/{{< var orcid >}})</span>
+    #   <span class="faux-block">{{< fa key >}} [PGP public key]({{< var pgp.key >}}) &emsp; {{< fa fingerprint >}} Fingerprint:</strong><br><span class="fingerprint">{{< var pgp.fingerprint >}}</span></span>
     right: |
-      <span class="faux-block">Made with {{< fa brands r-project >}} and [Quarto](https://quarto.org/)</span>
-      <span class="faux-block">[View the source at {{< fa brands github >}} GitHub]({{< var github-url >}})</span>
+      <span class="faux-block">Forked from [Andrew Heiss](https://www.andrewheiss.com/)</span>
+      # <span class="faux-block">[View the source at {{< fa brands github >}} GitHub]({{< var github-url >}})</span>
 
 format:
   html:
