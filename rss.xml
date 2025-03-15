@@ -1,0 +1,847 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss  xmlns:atom="http://www.w3.org/2005/Atom" 
+      xmlns:media="http://search.yahoo.com/mrss/" 
+      xmlns:content="http://purl.org/rss/1.0/modules/content/" 
+      xmlns:dc="http://purl.org/dc/elements/1.1/" 
+      version="2.0">
+<channel>
+<title>Andrew Heiss&#39;s blog</title>
+<link>https://www.andrewheiss.com/rss.html</link>
+<atom:link href="https://www.andrewheiss.com/rss.xml" rel="self" type="application/rss+xml"/>
+<description>Andrew Heiss&#39;s blog</description>
+<language>en</language>
+<generator>quarto-1.6.42</generator>
+<lastBuildDate>Wed, 19 Feb 2025 00:00:00 GMT</lastBuildDate>
+<item>
+  <title>How to use a histogram as a legend in {ggplot2}</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2025/02/19/ggplot-histogram-legend/</link>
+  <description><![CDATA[ Land isn’t unemployed—people are. Here’s how to use R, {ggplot2}, {sf}, and {patchwork} to create a histogram legend in a choropleth map to better see the distribution of values. ]]></description>
+  <category>r</category>
+  <category>tidyverse</category>
+  <category>ggplot</category>
+  <category>gis</category>
+  <category>maps</category>
+  <guid>https://www.andrewheiss.com/blog/2025/02/19/ggplot-histogram-legend/</guid>
+  <pubDate>Wed, 19 Feb 2025 00:00:00 GMT</pubDate>
+  <media:content url="https://www.andrewheiss.com/blog/2025/02/19/ggplot-histogram-legend/index_files/figure-html/plot-histogram-legend-1.png" medium="image" type="image/png" height="103" width="144"/>
+</item>
+<item>
+  <title>How to move Crimea from Russia to Ukraine in maps with R</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2025/02/13/natural-earth-crimea/</link>
+  <description><![CDATA[ Natural Earth’s de facto on-the-ground policy conflicts with de jure boundaries. Use {sf} and R to relocate parts of country shapes. ]]></description>
+  <category>r</category>
+  <category>tidyverse</category>
+  <category>ggplot</category>
+  <category>ojs</category>
+  <category>observable plot</category>
+  <category>gis</category>
+  <category>maps</category>
+  <guid>https://www.andrewheiss.com/blog/2025/02/13/natural-earth-crimea/</guid>
+  <pubDate>Thu, 13 Feb 2025 00:00:00 GMT</pubDate>
+  <media:content url="https://www.andrewheiss.com/blog/2025/02/13/natural-earth-crimea/index_files/figure-html/plot-eastern-europe-50-1.png" medium="image" type="image/png" height="89" width="144"/>
+</item>
+<item>
+  <title>Using USAID data to make fancy world maps with Observable Plot</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2025/02/10/usaid-ojs-maps/</link>
+  <description><![CDATA[ Manipulate geographic data, change projections, get live data from a database, and make interactive plots with Observable JS ]]></description>
+  <category>ojs</category>
+  <category>observable plot</category>
+  <category>gis</category>
+  <category>maps</category>
+  <category>usaid</category>
+  <guid>https://www.andrewheiss.com/blog/2025/02/10/usaid-ojs-maps/</guid>
+  <pubDate>Mon, 10 Feb 2025 00:00:00 GMT</pubDate>
+  <media:content url="https://www.andrewheiss.com/blog/2025/02/10/usaid-ojs-maps/img/final-plot.png" medium="image" type="image/png" height="74" width="144"/>
+</item>
+<item>
+  <title>Guide to comparing sample and population proportions with CPS data, both classically and Bayesianly</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2025/01/27/ipums-cps-proportions-bayes/</link>
+  <description><![CDATA[ Download CPS demographic data from IPUMS and use R and {brms} to calculate differences between sample and national proportions with Bayesian ROPE-based inference ]]></description>
+  <category>r</category>
+  <category>tidyverse</category>
+  <category>us census</category>
+  <category>ggplot</category>
+  <category>bayes</category>
+  <category>brms</category>
+  <category>surveys</category>
+  <guid>https://www.andrewheiss.com/blog/2025/01/27/ipums-cps-proportions-bayes/</guid>
+  <pubDate>Mon, 27 Jan 2025 00:00:00 GMT</pubDate>
+  <media:content url="https://www.andrewheiss.com/blog/2025/01/27/ipums-cps-proportions-bayes/index_files/figure-html/fig-prop-test-bayes-diffs-1.png" medium="image" type="image/png" height="108" width="144"/>
+</item>
+<item>
+  <title>Apple Music Wrapped with R</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2024/12/04/apple-music-wrapped-r/</link>
+  <description><![CDATA[ Use R to parse Apple Music XML files and create your own Spotify Wrapped-like stats ]]></description>
+  <category>r</category>
+  <category>tidyverse</category>
+  <category>music</category>
+  <guid>https://www.andrewheiss.com/blog/2024/12/04/apple-music-wrapped-r/</guid>
+  <pubDate>Wed, 04 Dec 2024 00:00:00 GMT</pubDate>
+  <media:content url="https://www.andrewheiss.com/blog/2024/12/04/apple-music-wrapped-r/img/social-image.png" medium="image" type="image/png" height="79" width="144"/>
+</item>
+<item>
+  <title>Guide to generating and rendering computational markdown content programmatically with Quarto</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2024/11/04/render-generated-r-chunks-quarto/</link>
+  <description><![CDATA[ Learn how to use knitr::knit() in inline chunks to correctly render auto-generated R and markdown content in Quarto documents ]]></description>
+  <category>r</category>
+  <category>quarto</category>
+  <category>markdown</category>
+  <guid>https://www.andrewheiss.com/blog/2024/11/04/render-generated-r-chunks-quarto/</guid>
+  <pubDate>Mon, 04 Nov 2024 00:00:00 GMT</pubDate>
+  <media:content url="https://www.andrewheiss.com/blog/2024/11/04/render-generated-r-chunks-quarto/img/continent-reports.png" medium="image" type="image/png" height="88" width="144"/>
+</item>
+<item>
+  <title>Fun with Positron</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2024/07/08/fun-with-positron/</link>
+  <description><![CDATA[ Combine the best of RStudio and Visual Studio Code in Posit’s new Positron IDE ]]></description>
+  <category>r</category>
+  <category>python</category>
+  <category>positron</category>
+  <category>data science</category>
+  <guid>https://www.andrewheiss.com/blog/2024/07/08/fun-with-positron/</guid>
+  <pubDate>Mon, 08 Jul 2024 00:00:00 GMT</pubDate>
+  <media:content url="https://www.andrewheiss.com/blog/2024/07/08/fun-with-positron/img/positron-logo.png" medium="image" type="image/png" height="81" width="144"/>
+</item>
+<item>
+  <title>Calculating the proportion of US state borders that are coastlines</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2024/05/08/coastline-to-border-proportions/</link>
+  <description><![CDATA[ Measuring coastlines is hard and causes fractal paradoxes, but we can use R and {sf} to try! ]]></description>
+  <category>r</category>
+  <category>tidyverse</category>
+  <category>ggplot</category>
+  <category>gis</category>
+  <category>maps</category>
+  <guid>https://www.andrewheiss.com/blog/2024/05/08/coastline-to-border-proportions/</guid>
+  <pubDate>Wed, 08 May 2024 00:00:00 GMT</pubDate>
+  <media:content url="https://www.andrewheiss.com/blog/2024/05/08/coastline-to-border-proportions/index_files/figure-html/plot-nc-census-coastal-borders-1.png" medium="image" type="image/png" height="89" width="144"/>
+</item>
+<item>
+  <title>Calculating birthday probabilities with R instead of math</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2024/05/03/birthday-spans-simulation-sans-math/</link>
+  <description><![CDATA[ Probability math is hard. Use brute force simulation to find the probability that a household has a cluster of birthdays. ]]></description>
+  <category>r</category>
+  <category>tidyverse</category>
+  <category>simulations</category>
+  <category>probability</category>
+  <guid>https://www.andrewheiss.com/blog/2024/05/03/birthday-spans-simulation-sans-math/</guid>
+  <pubDate>Fri, 03 May 2024 00:00:00 GMT</pubDate>
+  <media:content url="https://www.andrewheiss.com/blog/2024/05/03/birthday-spans-simulation-sans-math/index_files/figure-html/plot-heiss-birthday-cycle-1.png" medium="image" type="image/png" height="144" width="144"/>
+</item>
+<item>
+  <title>Visualizing {dplyr}’s mutate(), summarize(), group_by(), and ungroup() with animations</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2024/04/04/group_by-summarize-ungroup-animations/</link>
+  <description><![CDATA[ Visually explore how {dplyr}’s more complex core functions work together to wrangle data ]]></description>
+  <category>r</category>
+  <category>tidyverse</category>
+  <category>dplyr</category>
+  <category>animations</category>
+  <guid>https://www.andrewheiss.com/blog/2024/04/04/group_by-summarize-ungroup-animations/</guid>
+  <pubDate>Thu, 04 Apr 2024 00:00:00 GMT</pubDate>
+  <media:content url="https://www.andrewheiss.com/blog/2024/04/04/group_by-summarize-ungroup-animations/downloads/PNG/grp-summarize-02@4x.png" medium="image" type="image/png" height="81" width="144"/>
+</item>
+<item>
+  <title>Demystifying causal inference estimands: ATE, ATT, and ATU</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2024/03/21/demystifying-ate-att-atu/</link>
+  <description><![CDATA[ Explore why we care about the ATE, ATT, and ATU and figure out how to calculate them with observational data ]]></description>
+  <category>r</category>
+  <category>tidyverse</category>
+  <category>causal inference</category>
+  <category>DAGs</category>
+  <category>inverse probability weighting</category>
+  <guid>https://www.andrewheiss.com/blog/2024/03/21/demystifying-ate-att-atu/</guid>
+  <pubDate>Thu, 21 Mar 2024 00:00:00 GMT</pubDate>
+  <media:content url="https://www.andrewheiss.com/blog/2024/03/21/demystifying-ate-att-atu/index_files/figure-html/fig-propensity-weighted-ate-1.png" medium="image" type="image/png" height="108" width="144"/>
+</item>
+<item>
+  <title>DIY API with Make and {plumber}</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2024/01/12/diy-api-plumber-quarto-ojs/</link>
+  <description><![CDATA[ Use Make and {plumber} to create your own API and show live data in Quarto with R and Observable JS ]]></description>
+  <category>r</category>
+  <category>tidyverse</category>
+  <category>quarto</category>
+  <category>observablejs</category>
+  <category>plumber</category>
+  <category>api</category>
+  <category>make</category>
+  <category>goals</category>
+  <guid>https://www.andrewheiss.com/blog/2024/01/12/diy-api-plumber-quarto-ojs/</guid>
+  <pubDate>Fri, 12 Jan 2024 00:00:00 GMT</pubDate>
+  <media:content url="https://www.andrewheiss.com/blog/2024/01/12/diy-api-plumber-quarto-ojs/img/card.png" medium="image" type="image/png" height="53" width="144"/>
+</item>
+<item>
+  <title>How to create separate bibliographies in a Quarto document</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2023/12/11/separate-bibliographies-quarto/</link>
+  <description><![CDATA[ Use multibib and Quarto to create separate bibliographies for a document and an appendix ]]></description>
+  <category>quarto</category>
+  <category>pandoc</category>
+  <category>citations</category>
+  <category>markdown</category>
+  <category>acwri</category>
+  <category>writing</category>
+  <guid>https://www.andrewheiss.com/blog/2023/12/11/separate-bibliographies-quarto/</guid>
+  <pubDate>Mon, 11 Dec 2023 00:00:00 GMT</pubDate>
+  <media:content url="https://www.andrewheiss.com/blog/2023/12/11/separate-bibliographies-quarto/img/card.png" medium="image" type="image/png" height="81" width="144"/>
+</item>
+<item>
+  <title>Guide to understanding the intuition behind the Dirichlet distribution</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2023/09/18/understanding-dirichlet-beta-intuition/</link>
+  <description><![CDATA[ Learn about the Dirichlet distribution and explore how it’s just a fancier version of the Beta distribution ]]></description>
+  <category>r</category>
+  <category>statistics</category>
+  <category>regression</category>
+  <category>tidyverse</category>
+  <category>ggplot</category>
+  <guid>https://www.andrewheiss.com/blog/2023/09/18/understanding-dirichlet-beta-intuition/</guid>
+  <pubDate>Mon, 18 Sep 2023 00:00:00 GMT</pubDate>
+  <media:content url="https://www.andrewheiss.com/blog/2023/09/18/understanding-dirichlet-beta-intuition/index_files/figure-html/plot-3-7-2-betas-1.png" medium="image" type="image/png" height="99" width="144"/>
+</item>
+<item>
+  <title>Manually generate predicted values for logistic regression with matrix multiplication in R</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2023/08/15/matrix-multiply-logit-predict/</link>
+  <description><![CDATA[ This is like basic stats stuff, but I can never remember how to do it—here’s how to use matrix multiplication to replicate the results of predict() ]]></description>
+  <category>r</category>
+  <category>statistics</category>
+  <category>regression</category>
+  <guid>https://www.andrewheiss.com/blog/2023/08/15/matrix-multiply-logit-predict/</guid>
+  <pubDate>Tue, 15 Aug 2023 00:00:00 GMT</pubDate>
+  <media:content url="https://www.andrewheiss.com/blog/2023/08/15/matrix-multiply-logit-predict/social-image.png" medium="image" type="image/png" height="75" width="144"/>
+</item>
+<item>
+  <title>The ultimate practical guide to multilevel multinomial conjoint analysis with R</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2023/08/12/conjoint-multilevel-multinomial-guide/</link>
+  <description><![CDATA[ Learn how to use R, {brms}, {marginaleffects}, and {tidybayes} to analyze discrete choice conjoint data with fully specified hierarchical multilevel multinomial models ]]></description>
+  <category>r</category>
+  <category>tidyverse</category>
+  <category>ggplot</category>
+  <category>statistics</category>
+  <category>brms</category>
+  <category>stan</category>
+  <guid>https://www.andrewheiss.com/blog/2023/08/12/conjoint-multilevel-multinomial-guide/</guid>
+  <pubDate>Sat, 12 Aug 2023 00:00:00 GMT</pubDate>
+  <media:content url="https://www.andrewheiss.com/blog/2023/08/12/conjoint-multilevel-multinomial-guide/index_files/figure-html/plot-amces-minivans-carpool-1.png" medium="image" type="image/png" height="120" width="144"/>
+</item>
+<item>
+  <title>How to fill maps with density gradients with R, {ggplot2}, and {sf}</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2023/07/28/gradient-map-fills-r-sf/</link>
+  <description><![CDATA[ Fix overplotted points on maps by creating bins or filled desntiy gradients using R, {ggplot2}, and {sf} ]]></description>
+  <category>r</category>
+  <category>tidyverse</category>
+  <category>ggplot</category>
+  <category>gis</category>
+  <category>maps</category>
+  <guid>https://www.andrewheiss.com/blog/2023/07/28/gradient-map-fills-r-sf/</guid>
+  <pubDate>Fri, 28 Jul 2023 00:00:00 GMT</pubDate>
+  <media:content url="https://www.andrewheiss.com/blog/2023/07/28/gradient-map-fills-r-sf/index_files/figure-html/plot-all-1.png" medium="image" type="image/png" height="144" width="144"/>
+</item>
+<item>
+  <title>The ultimate practical guide to conjoint analysis with R</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2023/07/25/conjoint-bayesian-frequentist-guide/</link>
+  <description><![CDATA[ Learn how to use R, {brms}, and {marginaleffects} to analyze conjoint data and find causal and descriptive quantities of interest, both frequentistly and Bayesianly ]]></description>
+  <category>r</category>
+  <category>tidyverse</category>
+  <category>ggplot</category>
+  <category>statistics</category>
+  <category>brms</category>
+  <category>stan</category>
+  <guid>https://www.andrewheiss.com/blog/2023/07/25/conjoint-bayesian-frequentist-guide/</guid>
+  <pubDate>Tue, 25 Jul 2023 00:00:00 GMT</pubDate>
+  <media:content url="https://www.andrewheiss.com/blog/2023/07/25/conjoint-bayesian-frequentist-guide/index_files/figure-html/amce-mfx-bayes-plot-excerpt-1.png" medium="image" type="image/png" height="72" width="144"/>
+</item>
+<item>
+  <title>Road trip analysis! How to use and play with Google Location History in R</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2023/07/03/using-google-location-history-with-r-roadtrip/</link>
+  <description><![CDATA[ Learn how to use R to load and clean and play with all the location history data Google keeps about you and look at some neat plots and tables about our 5,000-mile summer road trip along the way ]]></description>
+  <category>r</category>
+  <category>tidyverse</category>
+  <category>ggplot</category>
+  <category>gis</category>
+  <category>maps</category>
+  <guid>https://www.andrewheiss.com/blog/2023/07/03/using-google-location-history-with-r-roadtrip/</guid>
+  <pubDate>Mon, 03 Jul 2023 00:00:00 GMT</pubDate>
+  <media:content url="https://www.andrewheiss.com/blog/2023/07/03/using-google-location-history-with-r-roadtrip/index_files/figure-html/fig-map-with-dates-1.png" medium="image" type="image/png" height="96" width="144"/>
+</item>
+<item>
+  <title>How to make fancy road trip maps with R and OpenStreetMap</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2023/06/01/geocoding-routing-openstreetmap-r/</link>
+  <description><![CDATA[ Use R to get geocoded location and routing data from OpenStreetMap and explore our family’s impending 5,000 mile road trip around the USA ]]></description>
+  <category>r</category>
+  <category>tidyverse</category>
+  <category>ggplot</category>
+  <category>gis</category>
+  <category>maps</category>
+  <guid>https://www.andrewheiss.com/blog/2023/06/01/geocoding-routing-openstreetmap-r/</guid>
+  <pubDate>Thu, 01 Jun 2023 00:00:00 GMT</pubDate>
+  <media:content url="https://www.andrewheiss.com/blog/2023/06/01/geocoding-routing-openstreetmap-r/index_files/figure-html/plot-routes-stops-distances-1.png" medium="image" type="image/png" height="89" width="144"/>
+</item>
+<item>
+  <title>A guide to Bayesian proportion tests with R and {brms}</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2023/05/15/fancy-bayes-diffs-props/</link>
+  <description><![CDATA[ Use R, Stan, and {brms} to calculate differences between categorical proportions in a principled Bayesian way ]]></description>
+  <category>r</category>
+  <category>tidyverse</category>
+  <category>ggplot</category>
+  <category>bayes</category>
+  <category>brms</category>
+  <category>stan</category>
+  <category>surveys</category>
+  <category>categorical data</category>
+  <guid>https://www.andrewheiss.com/blog/2023/05/15/fancy-bayes-diffs-props/</guid>
+  <pubDate>Mon, 15 May 2023 00:00:00 GMT</pubDate>
+  <media:content url="https://www.andrewheiss.com/blog/2023/05/15/fancy-bayes-diffs-props/index_files/figure-html/q2-plot-final-1.png" medium="image" type="image/png" height="66" width="144"/>
+</item>
+<item>
+  <title>Making Middle Earth maps with R</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2023/04/26/middle-earth-mapping-sf-r-gis/</link>
+  <description><![CDATA[ Explore Tolkien’s Middle Earth with R-based GIS tools, including {ggplot2} and {sf} ]]></description>
+  <category>r</category>
+  <category>tidyverse</category>
+  <category>ggplot</category>
+  <category>gis</category>
+  <category>maps</category>
+  <category>nerdery</category>
+  <guid>https://www.andrewheiss.com/blog/2023/04/26/middle-earth-mapping-sf-r-gis/</guid>
+  <pubDate>Wed, 26 Apr 2023 00:00:00 GMT</pubDate>
+  <media:content url="https://www.andrewheiss.com/blog/2023/04/26/middle-earth-mapping-sf-r-gis/index_files/figure-html/shire-zoomed-in-fancy-1.png" medium="image" type="image/png" height="100" width="144"/>
+</item>
+<item>
+  <title>How old was Aragorn in regular human years?</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2023/03/21/aragorn-dunedan-numenorean-simulation/</link>
+  <description><![CDATA[ Use statistical simulation and a hidden table of Númenórean ages from Tolkien’s unpublished works to convert Aragorn’s Dúnedan years to actual human years ]]></description>
+  <category>r</category>
+  <category>tidyverse</category>
+  <category>ggplot</category>
+  <category>simulations</category>
+  <category>brms</category>
+  <category>nerdery</category>
+  <guid>https://www.andrewheiss.com/blog/2023/03/21/aragorn-dunedan-numenorean-simulation/</guid>
+  <pubDate>Tue, 21 Mar 2023 00:00:00 GMT</pubDate>
+  <media:content url="https://www.andrewheiss.com/blog/2023/03/21/aragorn-dunedan-numenorean-simulation/img/aragorn-final-50.jpg" medium="image" type="image/jpeg"/>
+</item>
+<item>
+  <title>One Simple Trick™ to create inline bibliography entries with Markdown and pandoc</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2023/01/09/syllabus-csl-pandoc/</link>
+  <description><![CDATA[ By default, pandoc doesn’t include full bibliographic references inline in documents, but with one tweak to a CSL file, you can create syllabus-like lists of citations with full references ]]></description>
+  <category>writing</category>
+  <category>markdown</category>
+  <category>citations</category>
+  <category>pandoc</category>
+  <category>zotero</category>
+  <guid>https://www.andrewheiss.com/blog/2023/01/09/syllabus-csl-pandoc/</guid>
+  <pubDate>Mon, 09 Jan 2023 00:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>How to migrate from BibDesk to Zotero for pandoc-based writing</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2023/01/08/bibdesk-to-zotero-pandoc/</link>
+  <description><![CDATA[ Tips, tricks, and rationale for converting from a single big BibTeX file to a Zotero database ]]></description>
+  <category>writing</category>
+  <category>markdown</category>
+  <category>citations</category>
+  <category>pandoc</category>
+  <category>zotero</category>
+  <guid>https://www.andrewheiss.com/blog/2023/01/08/bibdesk-to-zotero-pandoc/</guid>
+  <pubDate>Sun, 08 Jan 2023 00:00:00 GMT</pubDate>
+  <media:content url="https://www.andrewheiss.com/blog/2023/01/08/bibdesk-to-zotero-pandoc/img/zotero-final.png" medium="image" type="image/png" height="87" width="144"/>
+</item>
+<item>
+  <title>How to use natural and base 10 log scales in ggplot2</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2022/12/08/log10-natural-log-scales-ggplot/</link>
+  <description><![CDATA[ Use the {scales} R package to automatically adjust and format x- and y-axis scales to use log base 10 and natural log values ]]></description>
+  <category>r</category>
+  <category>tidyverse</category>
+  <category>ggplot</category>
+  <category>data visualization</category>
+  <guid>https://www.andrewheiss.com/blog/2022/12/08/log10-natural-log-scales-ggplot/</guid>
+  <pubDate>Thu, 08 Dec 2022 00:00:00 GMT</pubDate>
+  <media:content url="https://www.andrewheiss.com/blog/2022/12/08/log10-natural-log-scales-ggplot/index_files/figure-html/plot-log-e-automatic-manual-breaks-1.png" medium="image" type="image/png" height="91" width="144"/>
+</item>
+<item>
+  <title>Marginal and conditional effects for GLMMs with {marginaleffects}</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2022/11/29/conditional-marginal-marginaleffects/</link>
+  <description><![CDATA[ Use the {marginaleffects} package to calculate tricky and nuanced marginal and conditional effects in generalized linear mixed models ]]></description>
+  <category>r</category>
+  <category>tidyverse</category>
+  <category>regression</category>
+  <category>statistics</category>
+  <category>bayes</category>
+  <category>brms</category>
+  <category>lognormal</category>
+  <guid>https://www.andrewheiss.com/blog/2022/11/29/conditional-marginal-marginaleffects/</guid>
+  <pubDate>Tue, 29 Nov 2022 00:00:00 GMT</pubDate>
+  <media:content url="https://www.andrewheiss.com/blog/2022/11/29/conditional-marginal-marginaleffects/index_files/figure-html/plot-conditional-preds-1.png" medium="image" type="image/png" height="98" width="144"/>
+</item>
+<item>
+  <title>Visualizing the differences between Bayesian posterior predictions, linear predictions, and the expectation of posterior predictions</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2022/09/26/guide-visualizing-types-posteriors/</link>
+  <description><![CDATA[ A guide to different types of Bayesian posterior distributions and the nuances of posterior_predict, posterior_epred, and posterior_linpred ]]></description>
+  <category>r</category>
+  <category>tidyverse</category>
+  <category>ggplot</category>
+  <category>regression</category>
+  <category>bayes</category>
+  <category>brms</category>
+  <category>stan</category>
+  <guid>https://www.andrewheiss.com/blog/2022/09/26/guide-visualizing-types-posteriors/</guid>
+  <pubDate>Mon, 26 Sep 2022 00:00:00 GMT</pubDate>
+  <media:content url="https://www.andrewheiss.com/blog/2022/09/26/guide-visualizing-types-posteriors/index_files/figure-html/plot-logit-predictions-1.png" medium="image" type="image/png" height="192" width="144"/>
+</item>
+<item>
+  <title>Quick and easy ways to deal with long labels in ggplot2</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2022/06/23/long-labels-ggplot/</link>
+  <description><![CDATA[ Explore different manual and automatic ways to rotate, dodge, recode, break up, and otherwise deal with long axis labels with ggplot2 ]]></description>
+  <category>r</category>
+  <category>tidyverse</category>
+  <category>ggplot</category>
+  <category>data visualization</category>
+  <guid>https://www.andrewheiss.com/blog/2022/06/23/long-labels-ggplot/</guid>
+  <pubDate>Thu, 23 Jun 2022 00:00:00 GMT</pubDate>
+  <media:content url="https://www.andrewheiss.com/blog/2022/06/23/long-labels-ggplot/index_files/figure-html/plot-all-1.png" medium="image" type="image/png" height="101" width="144"/>
+</item>
+<item>
+  <title>Marginalia: A guide to figuring out what the heck marginal effects, marginal slopes, average marginal effects, marginal effects at the mean, and all these other marginal things are</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2022/05/20/marginalia/</link>
+  <description><![CDATA[ Define what marginal effects even are, and then explore the subtle differences between average marginal effects, marginal effects at the mean, and marginal effects at representative values with the marginaleffects and emmeans R packages ]]></description>
+  <category>r</category>
+  <category>tidyverse</category>
+  <category>regression</category>
+  <category>statistics</category>
+  <category>data visualization</category>
+  <category>marginal effects</category>
+  <guid>https://www.andrewheiss.com/blog/2022/05/20/marginalia/</guid>
+  <pubDate>Fri, 20 May 2022 00:00:00 GMT</pubDate>
+  <media:content url="https://www.andrewheiss.com/blog/2022/05/20/marginalia/images/twitter-cover@3x.png" medium="image" type="image/png" height="75" width="144"/>
+</item>
+<item>
+  <title>A guide to modeling outcomes that have lots of zeros with Bayesian hurdle lognormal and hurdle Gaussian regression models</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2022/05/09/hurdle-lognormal-gaussian-brms/</link>
+  <description><![CDATA[ Create, manipulate, understand, analyze, interpret, and plot Bayesian hurdle regression models (and a custom hurdle Gaussian model!) using R, the tidyverse, emmeans, brms, and Stan ]]></description>
+  <guid>https://www.andrewheiss.com/blog/2022/05/09/hurdle-lognormal-gaussian-brms/</guid>
+  <pubDate>Mon, 09 May 2022 00:00:00 GMT</pubDate>
+  <media:content url="https://www.andrewheiss.com/blog/2022/05/09/hurdle-lognormal-gaussian-brms/index_files/figure-html/plot-emmeans-mfx-gdp-1.png" medium="image" type="image/png" height="144" width="144"/>
+</item>
+<item>
+  <title>How to create a(n almost) fully Bayesian outcome model with inverse probability weights</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2021/12/20/fully-bayesian-ate-iptw/</link>
+  <description><![CDATA[ Use a posterior distribution of inverse probability weights in a Bayesian outcome model to conduct (nearly) fully Bayesian causal inference with R, brms, and Stan ]]></description>
+  <category>r</category>
+  <category>tidyverse</category>
+  <category>regression</category>
+  <category>statistics</category>
+  <category>data visualization</category>
+  <category>causal inference</category>
+  <category>do calculus</category>
+  <category>DAGs</category>
+  <category>bayes</category>
+  <category>brms</category>
+  <category>stan</category>
+  <guid>https://www.andrewheiss.com/blog/2021/12/20/fully-bayesian-ate-iptw/</guid>
+  <pubDate>Mon, 20 Dec 2021 00:00:00 GMT</pubDate>
+  <media:content url="https://www.andrewheiss.com/blog/2021/12/20/fully-bayesian-ate-iptw/index_files/figure-html/plot-ate-posterior-1.png" medium="image" type="image/png" height="89" width="144"/>
+</item>
+<item>
+  <title>How to use Bayesian propensity scores and inverse probability weights</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2021/12/18/bayesian-propensity-scores-weights/</link>
+  <description><![CDATA[ For mathematical and philosophical reasons, propensity scores and inverse probability weights don’t work in Bayesian inference. But never fear! There’s still a way to do it! ]]></description>
+  <category>r</category>
+  <category>tidyverse</category>
+  <category>regression</category>
+  <category>statistics</category>
+  <category>data visualization</category>
+  <category>causal inference</category>
+  <category>do calculus</category>
+  <category>DAGs</category>
+  <category>bayes</category>
+  <category>brms</category>
+  <category>stan</category>
+  <guid>https://www.andrewheiss.com/blog/2021/12/18/bayesian-propensity-scores-weights/</guid>
+  <pubDate>Sat, 18 Dec 2021 00:00:00 GMT</pubDate>
+  <media:content url="https://www.andrewheiss.com/blog/2021/12/18/bayesian-propensity-scores-weights/index_files/figure-html/plot-iptw-pseudo-populations-1.png" medium="image" type="image/png" height="89" width="144"/>
+</item>
+<item>
+  <title>A guide to working with country-year panel data and Bayesian multilevel models</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2021/12/01/multilevel-models-panel-data-guide/</link>
+  <description><![CDATA[ How to use multilevel models with R and brms to work with country-year panel data. ]]></description>
+  <category>r</category>
+  <category>tidyverse</category>
+  <category>regression</category>
+  <category>statistics</category>
+  <category>data visualization</category>
+  <category>bayes</category>
+  <category>brms</category>
+  <category>stan</category>
+  <guid>https://www.andrewheiss.com/blog/2021/12/01/multilevel-models-panel-data-guide/</guid>
+  <pubDate>Wed, 01 Dec 2021 00:00:00 GMT</pubDate>
+  <media:content url="https://www.andrewheiss.com/blog/2021/12/01/multilevel-models-panel-data-guide/index_files/figure-html/plot-global-hypothetical-year-year-1.png" medium="image" type="image/png" height="96" width="144"/>
+</item>
+<item>
+  <title>A guide to correctly calculating posterior predictions and average marginal effects with multilievel Bayesian models</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2021/11/10/ame-bayes-re-guide/</link>
+  <description><![CDATA[ How to calculate grand means, conditional group means, and hypothetical group means of posterior predictions from multilevel brms models. ]]></description>
+  <category>r</category>
+  <category>tidyverse</category>
+  <category>regression</category>
+  <category>statistics</category>
+  <category>data visualization</category>
+  <category>bayes</category>
+  <category>brms</category>
+  <category>stan</category>
+  <category>beta</category>
+  <guid>https://www.andrewheiss.com/blog/2021/11/10/ame-bayes-re-guide/</guid>
+  <pubDate>Wed, 10 Nov 2021 00:00:00 GMT</pubDate>
+  <media:content url="https://www.andrewheiss.com/blog/2021/11/10/ame-bayes-re-guide/index_files/figure-html/all-effects-combined-1.png" medium="image" type="image/png" height="115" width="144"/>
+</item>
+<item>
+  <title>A guide to modeling proportions with Bayesian beta and zero-inflated beta regression models</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2021/11/08/beta-regression-guide/</link>
+  <description><![CDATA[ Everything you ever wanted to know about beta regression! Use R and brms to correctly model proportion data, and learn all about the beta distribution along the way. ]]></description>
+  <category>r</category>
+  <category>tidyverse</category>
+  <category>regression</category>
+  <category>statistics</category>
+  <category>data visualization</category>
+  <category>bayes</category>
+  <category>beta</category>
+  <guid>https://www.andrewheiss.com/blog/2021/11/08/beta-regression-guide/</guid>
+  <pubDate>Mon, 08 Nov 2021 00:00:00 GMT</pubDate>
+  <media:content url="https://www.andrewheiss.com/blog/2021/11/08/beta-regression-guide/index_files/figure-html/plot-dist-beta-shifted-1.png" medium="image" type="image/png" height="89" width="144"/>
+</item>
+<item>
+  <title>Do-calculus adventures! Exploring the three rules of do-calculus in plain language and deriving the backdoor adjustment formula by hand</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2021/09/07/do-calculus-backdoors/</link>
+  <description><![CDATA[ Use R to explore the three rules of do-calculus in plain language and derive the backdoor adjustment formula by hand ]]></description>
+  <category>r</category>
+  <category>tidyverse</category>
+  <category>DAGs</category>
+  <category>causal inference</category>
+  <category>do calculus</category>
+  <guid>https://www.andrewheiss.com/blog/2021/09/07/do-calculus-backdoors/</guid>
+  <pubDate>Tue, 07 Sep 2021 00:00:00 GMT</pubDate>
+  <media:content url="https://www.andrewheiss.com/blog/2021/09/07/do-calculus-backdoors/do-calculus-math.png" medium="image" type="image/png" height="81" width="144"/>
+</item>
+<item>
+  <title>How to automatically convert TikZ images to SVG (with fonts!) from knitr</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2021/08/27/tikz-knitr-html-svg-fun/</link>
+  <description><![CDATA[ Make knitr and R Markdown convert TikZ graphics to font-embedded SVG files when knitting to HTML ]]></description>
+  <category>r</category>
+  <category>tidyverse</category>
+  <category>R markdown</category>
+  <category>tikz</category>
+  <guid>https://www.andrewheiss.com/blog/2021/08/27/tikz-knitr-html-svg-fun/</guid>
+  <pubDate>Fri, 27 Aug 2021 00:00:00 GMT</pubDate>
+  <media:content url="https://www.andrewheiss.com/blog/2021/08/27/tikz-knitr-html-svg-fun/example-final.png" medium="image" type="image/png" height="75" width="144"/>
+</item>
+<item>
+  <title>Exploring Pamela Jakiela’s simple TWFE diagnostics with R</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2021/08/25/twfe-diagnostics/</link>
+  <description><![CDATA[ Use R to explore possible biases that come from differential treatment timing in two-way fixed effects (TWFE) regression models ]]></description>
+  <category>r</category>
+  <category>tidyverse</category>
+  <category>regression</category>
+  <category>statistics</category>
+  <category>data visualization</category>
+  <category>econometrics</category>
+  <category>panel data</category>
+  <guid>https://www.andrewheiss.com/blog/2021/08/25/twfe-diagnostics/</guid>
+  <pubDate>Wed, 25 Aug 2021 00:00:00 GMT</pubDate>
+  <media:content url="https://www.andrewheiss.com/blog/2021/08/25/twfe-diagnostics/index_files/figure-html/show-weights-hist-1.png" medium="image" type="image/png" height="81" width="144"/>
+</item>
+<item>
+  <title>Exploring R² and regression variance with Euler/Venn diagrams</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2021/08/21/r2-euler/</link>
+  <description><![CDATA[ Use Venn diagrams to visualize the proportion of an outcome explained by a regression model ]]></description>
+  <category>r</category>
+  <category>tidyverse</category>
+  <category>regression</category>
+  <category>statistics</category>
+  <category>data visualization</category>
+  <guid>https://www.andrewheiss.com/blog/2021/08/21/r2-euler/</guid>
+  <pubDate>Sat, 21 Aug 2021 00:00:00 GMT</pubDate>
+  <media:content url="https://www.andrewheiss.com/blog/2021/08/21/r2-euler/index_files/figure-html/nice-plot-1.png" medium="image" type="image/png" height="173" width="144"/>
+</item>
+<item>
+  <title>AFC Richmond / Ted Lasso cross stitch pattern</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2021/07/20/afc-richmond-ted-lasso-cross-stitch/</link>
+  <description><![CDATA[ Make your own Ted Lasso AFC Richmond crest cross stitch with a free pattern and an Illustrator template ]]></description>
+  <category>art</category>
+  <category>cross stitch</category>
+  <category>pandemic boredom</category>
+  <category>ted lasso</category>
+  <guid>https://www.andrewheiss.com/blog/2021/07/20/afc-richmond-ted-lasso-cross-stitch/</guid>
+  <pubDate>Tue, 20 Jul 2021 00:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>Hex sticker/logo cross stitch pattern</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2021/07/10/hex-cross-stitch/</link>
+  <description><![CDATA[ Make your own data science hex logo cross stitch with a free pattern and an Illustrator template ]]></description>
+  <category>art</category>
+  <category>cross stitch</category>
+  <category>pandemic boredom</category>
+  <category>data science</category>
+  <guid>https://www.andrewheiss.com/blog/2021/07/10/hex-cross-stitch/</guid>
+  <pubDate>Sat, 10 Jul 2021 00:00:00 GMT</pubDate>
+  <media:content url="https://www.andrewheiss.com/blog/2021/07/10/hex-cross-stitch/card-image.jpg" medium="image" type="image/jpeg"/>
+</item>
+<item>
+  <title>Bayesian (cross stitch) sampler</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2021/01/26/bayesian-cross-stitch-sampler/</link>
+  <description><![CDATA[ Make your own Bayesian cross stitch sampler with a free pattern of Bayes Theorem and the accompanying Illustrator template ]]></description>
+  <category>art</category>
+  <category>cross stitch</category>
+  <category>pandemic boredom</category>
+  <category>bayes</category>
+  <guid>https://www.andrewheiss.com/blog/2021/01/26/bayesian-cross-stitch-sampler/</guid>
+  <pubDate>Tue, 26 Jan 2021 00:00:00 GMT</pubDate>
+  <media:content url="https://www.andrewheiss.com/blog/2021/01/26/bayesian-cross-stitch-sampler/sampler-photo.jpg" medium="image" type="image/jpeg"/>
+</item>
+<item>
+  <title>Marginal structural models for panel data with GEE and multilevel models</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2021/01/15/msm-gee-multilevel/</link>
+  <description><![CDATA[ Use R to correctly close backdoor confounding in panel data with marginal structural models and inverse probability weights with both GEE and multilevel models ]]></description>
+  <category>r</category>
+  <category>tidyverse</category>
+  <category>causal inference</category>
+  <category>DAGs</category>
+  <category>do calculus</category>
+  <category>inverse probability weighting</category>
+  <guid>https://www.andrewheiss.com/blog/2021/01/15/msm-gee-multilevel/</guid>
+  <pubDate>Fri, 15 Jan 2021 00:00:00 GMT</pubDate>
+  <media:content url="https://www.andrewheiss.com/blog/2021/01/15/msm-gee-multilevel/index_files/figure-html/depression-dag-1.png" medium="image" type="image/png" height="60" width="144"/>
+</item>
+<item>
+  <title>Generating inverse probability weights for marginal structural models with time-series cross-sectional panel data</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2020/12/03/ipw-tscs-msm/</link>
+  <description><![CDATA[ Use R to close backdoor confounding in panel data with marginal structural models and inverse probability weights for both binary and continuous treatments ]]></description>
+  <category>r</category>
+  <category>tidyverse</category>
+  <category>causal inference</category>
+  <category>DAGs</category>
+  <category>do calculus</category>
+  <category>inverse probability weighting</category>
+  <guid>https://www.andrewheiss.com/blog/2020/12/03/ipw-tscs-msm/</guid>
+  <pubDate>Thu, 03 Dec 2020 00:00:00 GMT</pubDate>
+  <media:content url="https://www.andrewheiss.com/blog/2020/12/03/ipw-tscs-msm/blackwell-glynn-fig-2.png" medium="image" type="image/png" height="44" width="144"/>
+</item>
+<item>
+  <title>Generating inverse probability weights for both binary and continuous treatments</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2020/12/01/ipw-binary-continuous/</link>
+  <description><![CDATA[ Use R to close backdoor confounding by generating and using inverse probability weights for both binary and continuous treatments ]]></description>
+  <category>r</category>
+  <category>tidyverse</category>
+  <category>causal inference</category>
+  <category>DAGs</category>
+  <category>do calculus</category>
+  <category>inverse probability weighting</category>
+  <guid>https://www.andrewheiss.com/blog/2020/12/01/ipw-binary-continuous/</guid>
+  <pubDate>Tue, 01 Dec 2020 00:00:00 GMT</pubDate>
+  <media:content url="https://www.andrewheiss.com/blog/2020/12/01/ipw-binary-continuous/index_files/figure-html/dag-binary-1.png" medium="image" type="image/png" height="89" width="144"/>
+</item>
+<item>
+  <title>Emergency online teaching resources</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2020/03/12/emergency-online-teaching-resources/</link>
+  <description><![CDATA[ List of resources to help teach online as universities rapidly shut down during the COVID-19 pandemic ]]></description>
+  <category>teaching</category>
+  <category>COVID-19</category>
+  <guid>https://www.andrewheiss.com/blog/2020/03/12/emergency-online-teaching-resources/</guid>
+  <pubDate>Thu, 12 Mar 2020 00:00:00 GMT</pubDate>
+  <media:content url="https://www.andrewheiss.com/blog/2020/03/12/emergency-online-teaching-resources/emergency-teaching-img.jpg" medium="image" type="image/jpeg"/>
+</item>
+<item>
+  <title>Ways to close backdoors in DAGs</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2020/02/25/closing-backdoors-dags/</link>
+  <description><![CDATA[ Use regression, inverse probability weighting, and matching to close confounding backdoors and find causation in observational data ]]></description>
+  <guid>https://www.andrewheiss.com/blog/2020/02/25/closing-backdoors-dags/</guid>
+  <pubDate>Tue, 25 Feb 2020 00:00:00 GMT</pubDate>
+  <media:content url="https://www.andrewheiss.com/blog/2020/02/25/closing-backdoors-dags/load-libraries-make-dag-1.png" medium="image" type="image/png" height="87" width="144"/>
+</item>
+<item>
+  <title>Automatically zip up subdirectories with Make</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2020/01/10/makefile-subdirectory-zips/</link>
+  <description><![CDATA[ Use a Makefile to automatically zip up all subdirectories in a given folder while also accounting for dependencies ]]></description>
+  <guid>https://www.andrewheiss.com/blog/2020/01/10/makefile-subdirectory-zips/</guid>
+  <pubDate>Fri, 10 Jan 2020 00:00:00 GMT</pubDate>
+  <media:content url="https://www.andrewheiss.com/blog/2020/01/10/makefile-subdirectory-zips/makefile-subdirectory-zips.png" medium="image" type="image/png" height="81" width="144"/>
+</item>
+<item>
+  <title>Create a dynamic dashboard with R, flexdashboard, and Shiny</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2020/01/01/flexdashboard-dynamic-data/</link>
+  <description><![CDATA[ Use R Markdown, flexdashboard, and Shiny to create a dashboard that automatically loads data from a Google Sheet ]]></description>
+  <category>R markdown</category>
+  <category>shiny</category>
+  <category>r</category>
+  <category>google sheets</category>
+  <guid>https://www.andrewheiss.com/blog/2020/01/01/flexdashboard-dynamic-data/</guid>
+  <pubDate>Wed, 01 Jan 2020 00:00:00 GMT</pubDate>
+  <media:content url="https://www.andrewheiss.com/blog/2020/01/01/flexdashboard-dynamic-data/shiny.png" medium="image" type="image/png" height="92" width="144"/>
+</item>
+<item>
+  <title>Convert Markdown to rich text (with syntax highlighting!) in any macOS app</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2019/10/09/convert-md-rtf-macos-services/</link>
+  <description><![CDATA[ Create a macOS Automator service to convert Markdown to rich text from any app in macOS ]]></description>
+  <category>pandoc</category>
+  <category>macos</category>
+  <guid>https://www.andrewheiss.com/blog/2019/10/09/convert-md-rtf-macos-services/</guid>
+  <pubDate>Wed, 09 Oct 2019 00:00:00 GMT</pubDate>
+  <media:content url="https://www.andrewheiss.com/blog/2019/10/09/convert-md-rtf-macos-services/workflow-best.png" medium="image" type="image/png" height="88" width="144"/>
+</item>
+<item>
+  <title>Chidi’s budget and utility: doing algebra and calculus with R and yacas</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2019/02/16/algebra-calculus-r-yacas/</link>
+  <description><![CDATA[ Use algebra and calculus with R and yacas to find Chidi’s optimal level of pizza and frozen yogurt consumption given his budget and utility function. ]]></description>
+  <category>r</category>
+  <category>ggplot</category>
+  <category>tidyverse</category>
+  <category>yacas</category>
+  <category>economics</category>
+  <guid>https://www.andrewheiss.com/blog/2019/02/16/algebra-calculus-r-yacas/</guid>
+  <pubDate>Sat, 16 Feb 2019 00:00:00 GMT</pubDate>
+  <media:content url="https://www.andrewheiss.com/blog/2019/02/16/algebra-calculus-r-yacas/complete-example-1.png" medium="image" type="image/png" height="103" width="144"/>
+</item>
+<item>
+  <title>Half a dozen frequentist and Bayesian ways to measure the difference in means in two groups</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2019/01/29/diff-means-half-dozen-ways/</link>
+  <description><![CDATA[ Learn how to run standard t-tests, simulations, and Bayesian difference in means tests with R and Stan ]]></description>
+  <category>r</category>
+  <category>ggplot</category>
+  <category>tidyverse</category>
+  <category>stan</category>
+  <category>bayes</category>
+  <guid>https://www.andrewheiss.com/blog/2019/01/29/diff-means-half-dozen-ways/</guid>
+  <pubDate>Tue, 29 Jan 2019 00:00:00 GMT</pubDate>
+  <media:content url="https://www.andrewheiss.com/blog/2019/01/29/diff-means-half-dozen-ways/compare-everything-1.png" medium="image" type="image/png" height="67" width="144"/>
+</item>
+<item>
+  <title>The academic job search finally comes to an end</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2018/12/17/academic-job-market-visualized/</link>
+  <description><![CDATA[ Explore 2.5 years of applying for academic jobs with fancy data visualization ]]></description>
+  <category>r</category>
+  <category>ggplot</category>
+  <category>dataviz</category>
+  <category>jobs</category>
+  <guid>https://www.andrewheiss.com/blog/2018/12/17/academic-job-market-visualized/</guid>
+  <pubDate>Mon, 17 Dec 2018 00:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>How to test any hypothesis with the infer package</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2018/12/05/test-any-hypothesis/</link>
+  <description><![CDATA[ Use the infer package in R to test any statistical hypothesis through simulation. ]]></description>
+  <category>r</category>
+  <category>tidyverse</category>
+  <category>infer</category>
+  <category>hypothesis testing</category>
+  <guid>https://www.andrewheiss.com/blog/2018/12/05/test-any-hypothesis/</guid>
+  <pubDate>Wed, 05 Dec 2018 00:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>Create a cheap, disposable supercomputer with R, DigitalOcean, and future</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2018/07/30/disposable-supercomputer-future/</link>
+  <description><![CDATA[ Use the future R package to run computationally intensive R commands on a cluster of remote computers ]]></description>
+  <guid>https://www.andrewheiss.com/blog/2018/07/30/disposable-supercomputer-future/</guid>
+  <pubDate>Mon, 30 Jul 2018 00:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>Show multiply imputed results in a side-by-side regression table with broom and huxtable</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2018/03/08/amelia-broom-huxtable/</link>
+  <description><![CDATA[ Extend broom’s tidy() and glance() to work with lists of multiply imputed regression models ]]></description>
+  <category>r</category>
+  <category>imputation</category>
+  <category>tidyverse</category>
+  <category>markdown</category>
+  <guid>https://www.andrewheiss.com/blog/2018/03/08/amelia-broom-huxtable/</guid>
+  <pubDate>Thu, 08 Mar 2018 00:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>Meld regression output from multiple imputations with tidyverse</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2018/03/07/amelia-tidy-melding/</link>
+  <description><![CDATA[ Use tidyverse functions to correctly meld and pool multiply imputed model output. ]]></description>
+  <category>r</category>
+  <category>imputation</category>
+  <category>tidyverse</category>
+  <guid>https://www.andrewheiss.com/blog/2018/03/07/amelia-tidy-melding/</guid>
+  <pubDate>Wed, 07 Mar 2018 00:00:00 GMT</pubDate>
+</item>
+<item>
+  <title>Fun with empirical and function-based derivatives in R</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2018/02/15/derivatives-r-fun/</link>
+  <description><![CDATA[ Use R to do things with derivatives, both with actual functions and with existing empirical data. ]]></description>
+  <category>r</category>
+  <category>ggplot</category>
+  <category>dataviz</category>
+  <category>economics</category>
+  <guid>https://www.andrewheiss.com/blog/2018/02/15/derivatives-r-fun/</guid>
+  <pubDate>Thu, 15 Feb 2018 00:00:00 GMT</pubDate>
+  <media:content url="https://www.andrewheiss.com/blog/2018/02/15/derivatives-r-fun/index_files/figure-html/plot-all-empirical-1.png" medium="image" type="image/png" height="115" width="144"/>
+</item>
+<item>
+  <title>Working with R, Cairo graphics, custom fonts, and ggplot</title>
+  <dc:creator>Andrew Heiss</dc:creator>
+  <link>https://www.andrewheiss.com/blog/2017/09/27/working-with-r-cairo-graphics-custom-fonts-and-ggplot/</link>
+  <description><![CDATA[ The Cairo graphics library makes it easy to embed custom fonts in PDFs and create high resolution PNGs (with either AGG or Cairo). ]]></description>
+  <category>r</category>
+  <category>ggplot</category>
+  <category>dataviz</category>
+  <category>cairo</category>
+  <category>fonts</category>
+  <guid>https://www.andrewheiss.com/blog/2017/09/27/working-with-r-cairo-graphics-custom-fonts-and-ggplot/</guid>
+  <pubDate>Wed, 27 Sep 2017 00:00:00 GMT</pubDate>
+  <media:content url="https://www.andrewheiss.com/blog/2017/09/27/working-with-r-cairo-graphics-custom-fonts-and-ggplot/example-plot-1.png" medium="image" type="image/png" height="108" width="144"/>
+</item>
+</channel>
+</rss>

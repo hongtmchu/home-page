@@ -1,0 +1,1433 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.42">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<meta name="author" content="Andrew Heiss">
+<meta name="description" content="Use R to parse Apple Music XML files and create your own Spotify Wrapped-like stats">
+<title>Apple Music Wrapped with R | Andrew Heiss – Andrew Heiss</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+<script src="../../../../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../../../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../../../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../../../../">
+<link href="../../../../..//files/favicon-512.png" rel="icon" type="image/png">
+<script src="../../../../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../../../site_libs/quarto-html/quarto-syntax-highlighting-17c909d5fd25ae21b861c0c7a49b2096.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../../../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../../../../site_libs/bootstrap/bootstrap-5cd0811f461c8271ae6bab49df9501be.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../../../../site_libs/quarto-contrib/fontawesome6-0.1.0/all.css" rel="stylesheet">
+<link href="../../../../../site_libs/quarto-contrib/fontawesome6-0.1.0/latex-fontsize.css" rel="stylesheet">
+<script src="../../../../../site_libs/quarto-contrib/iconify-2.0.0/iconify-icon.min.js"></script><script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script><script type="text/javascript">
+
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-527449-5', 'auto');
+
+ga('send', {
+  hitType: 'pageview',
+  'anonymizeIp': true,
+});
+</script><style>
+
+      .quarto-title-block .quarto-title-banner {
+        background: #170C3A;
+      }
+</style>
+<meta property="og:title" content="Apple Music Wrapped with R | Andrew Heiss">
+<meta property="og:description" content="Use R to parse Apple Music XML files and create your own Spotify Wrapped-like stats">
+<meta property="og:image" content="https://www.andrewheiss.com/blog/2024/12/04/apple-music-wrapped-r/img/social-image.png">
+<meta property="og:site_name" content="Andrew Heiss">
+<meta property="og:locale" content="en_US">
+<meta property="og:image:height" content="987">
+<meta property="og:image:width" content="1791">
+<meta name="twitter:title" content="Apple Music Wrapped with R | Andrew Heiss">
+<meta name="twitter:description" content="Use R to parse Apple Music XML files and create your own Spotify Wrapped-like stats">
+<meta name="twitter:image" content="https://www.andrewheiss.com/blog/2024/12/04/apple-music-wrapped-r/img/social-image.png">
+<meta name="twitter:creator" content="@andrewheiss">
+<meta name="twitter:site" content="@andrewheiss">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image-height" content="987">
+<meta name="twitter:image-width" content="1791">
+</head>
+<body class="floating nav-fixed slimcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner"><nav class="navbar navbar-expand-lg " data-bs-theme="dark"><div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../../../../index.html">
+    <span class="navbar-title">Andrew Heiss</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+<li class="nav-item">
+    <a class="nav-link" href="../../../../../index.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../../../cv/index.html"> 
+<span class="menu-text">CV</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../../../blog/index.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../../../research/index.html"> 
+<span class="menu-text">Research</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../../../teaching/index.html"> 
+<span class="menu-text">Teaching</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../../../talks/index.html"> 
+<span class="menu-text">Talks</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../../../now/index.html"> 
+<span class="menu-text">Now</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../../../uses/index.html"> 
+<span class="menu-text">Uses</span></a>
+  </li>  
+</ul>
+<ul class="navbar-nav navbar-nav-scroll ms-auto">
+<li class="nav-item">
+    <a class="nav-link" href="../../../../../atom.xml"> 
+<span class="menu-text"><iconify-icon inline="" icon="bi:rss" style="font-size: 1.1em;" aria-label="Icon rss from bi Iconify.design set." title="RSS"></iconify-icon></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="mailto:aheiss@gsu.edu"> 
+<span class="menu-text"><iconify-icon inline="" icon="bi:envelope" style="font-size: 1.1em;" aria-label="Icon envelope from bi Iconify.design set." title="E-mail"></iconify-icon></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://bsky.app/profile/andrew.heiss.phd" rel="me"> 
+<span class="menu-text"><iconify-icon inline="" icon="fa6-brands:bluesky" style="font-size: 1.1em;" aria-label="Icon bluesky from fa6-brands Iconify.design set." title="Bluesky"></iconify-icon></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://fediscience.org/users/andrew/" rel="me"> 
+<span class="menu-text"><iconify-icon inline="" icon="bi:mastodon" style="font-size: 1.1em;" aria-label="Icon mastodon from bi Iconify.design set." title="Mastodon"></iconify-icon></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://github.com/andrewheiss" rel="me"> 
+<span class="menu-text"><iconify-icon inline="" icon="bi:github" style="font-size: 1.1em;" aria-label="Icon github from bi Iconify.design set." title="GitHub"></iconify-icon></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://www.youtube.com/andrewheiss" rel="me"> 
+<span class="menu-text"><iconify-icon inline="" icon="bi:youtube" style="font-size: 1.1em;" aria-label="Icon youtube from bi Iconify.design set." title="YouTube"></iconify-icon></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://www.heissatopia.com/"> 
+<span class="menu-text"><iconify-icon inline="" icon="fa6-brands:blogger" style="font-size: 1.15em;" aria-label="Icon blogger from fa6-brands Iconify.design set." title="Blogger"></iconify-icon></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://www.linkedin.com/in/andrewheiss" rel="me"> 
+<span class="menu-text"><iconify-icon inline="" icon="bi:linkedin" style="font-size: 1.1em;" aria-label="Icon linkedin from bi Iconify.design set." title="LinkedIn"></iconify-icon></span></a>
+  </li>  
+</ul>
+</div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav></header><!-- content --><header id="title-block-header" class="quarto-title-block default blog-post page-columns page-full"><div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <div class="quarto-title-block"><div><h1 class="title">Apple Music Wrapped with R</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
+                  <div>
+        <div class="description">
+          Use R to parse Apple Music XML files and create your own Spotify Wrapped-like stats
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">r</div>
+                <div class="quarto-category">tidyverse</div>
+                <div class="quarto-category">music</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p><a href="https://www.andrewheiss.com/">Andrew Heiss</a> <a href="https://orcid.org/0000-0002-3948-3914" class="quarto-title-author-orcid"> <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2ZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo1N0NEMjA4MDI1MjA2ODExOTk0QzkzNTEzRjZEQTg1NyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDozM0NDOEJGNEZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDozM0NDOEJGM0ZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M1IE1hY2ludG9zaCI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkZDN0YxMTc0MDcyMDY4MTE5NUZFRDc5MUM2MUUwNEREIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjU3Q0QyMDgwMjUyMDY4MTE5OTRDOTM1MTNGNkRBODU3Ii8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+84NovQAAAR1JREFUeNpiZEADy85ZJgCpeCB2QJM6AMQLo4yOL0AWZETSqACk1gOxAQN+cAGIA4EGPQBxmJA0nwdpjjQ8xqArmczw5tMHXAaALDgP1QMxAGqzAAPxQACqh4ER6uf5MBlkm0X4EGayMfMw/Pr7Bd2gRBZogMFBrv01hisv5jLsv9nLAPIOMnjy8RDDyYctyAbFM2EJbRQw+aAWw/LzVgx7b+cwCHKqMhjJFCBLOzAR6+lXX84xnHjYyqAo5IUizkRCwIENQQckGSDGY4TVgAPEaraQr2a4/24bSuoExcJCfAEJihXkWDj3ZAKy9EJGaEo8T0QSxkjSwORsCAuDQCD+QILmD1A9kECEZgxDaEZhICIzGcIyEyOl2RkgwAAhkmC+eAm0TAAAAABJRU5ErkJggg=="></a></p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">Wednesday, December 4, 2024</p>
+      </div>
+    </div>
+    
+      
+      <div>
+      <div class="quarto-title-meta-heading">Doi</div>
+      <div class="quarto-title-meta-contents">
+        <p class="doi">
+          <a href="https://doi.org/10.59350/64kxj-xp130">10.59350/64kxj-xp130</a>
+        </p>
+      </div>
+    </div>
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto"><nav id="TOC" role="doc-toc" class="toc-active"><h2 id="toc-title">Contents</h2>
+   
+  <ul>
+<li><a href="#calculating-2024-play-counts-with-r" id="toc-calculating-2024-play-counts-with-r" class="nav-link active" data-scroll-target="#calculating-2024-play-counts-with-r">Calculating 2024 play counts with R</a></li>
+  <li><a href="#minutes-listened" id="toc-minutes-listened" class="nav-link" data-scroll-target="#minutes-listened">Minutes listened</a></li>
+  <li><a href="#new-music" id="toc-new-music" class="nav-link" data-scroll-target="#new-music">New music</a></li>
+  <li><a href="#top-songs" id="toc-top-songs" class="nav-link" data-scroll-target="#top-songs">Top songs</a></li>
+  <li><a href="#top-artists" id="toc-top-artists" class="nav-link" data-scroll-target="#top-artists">Top artists</a></li>
+  <li><a href="#top-albums" id="toc-top-albums" class="nav-link" data-scroll-target="#top-albums">Top albums</a></li>
+  <li><a href="#final-images" id="toc-final-images" class="nav-link" data-scroll-target="#final-images">Final images</a></li>
+  </ul></nav>
+</nav><div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block page-columns page-full" id="quarto-document-content"><p>’Tis the season for Spotify Wrapped stats and I love it, both for seeing what everyone listens to and because it’s such a cool way of presenting data. A few years ago on Twitter, <a href="https://bsky.app/profile/beeonaposy.bsky.social">Caitlin</a> <a href="https://www.caitlinhudon.com/">Hudon</a> noted that</p>
+<blockquote class="blockquote">
+<p>Spotify Wrapped is a great example of how you can build a fantastic data product without maching learning or AI. (<a href="https://x.com/beeonaposy/status/1334203860345208832?lang=en">@beeonaposy</a>)</p>
+</blockquote>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure"><p><img src="img/caitlin-tweet.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:70.0%"></p>
+</figure>
+</div>
+<p>At its core, Spotify Wrapped is really just some grouped and summarized data—a <a href="https://en.wikipedia.org/wiki/Pivot_table">PivotTable</a> with some album cover art slapped on. And it’s fun and neat and everyone loves it!</p>
+<p>I’ve always been jealous of everyone’s annual Spotify Wrapped reports, but since I don’t use Spotify, <a href="https://bsky.app/profile/andrew.heiss.phd/post/3kfe3pe32jm2g">I’ve never gotten to see my own details</a>.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure"><p><img src="img/me-bluesky-post.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:80.0%"></p>
+</figure>
+</div>
+<p>Because I’m an Elder Millennial and started listening to music in the days of Napster, I prefer to control my music files rather than stream it Spotify-style, so I get all my stuff from either the Amazon Music store or <a href="https://bandcamp.com/">Bandcamp</a> since they both provide DRM-free MP3s. I listen to everything in the used-to-be-iTunes Music app (not to be confused with Apple’s music streaming service, Apple Music), and I use <a href="https://support.apple.com/en-us/108935">iTunes Match</a> to access my library across all my devices.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
+<div class="no-row-height column-margin column-container"><div id="fn1"><p><sup>1</sup>&nbsp;I also have it all backed up to a <a href="https://www.plex.tv/">Plex</a> server on a <a href="https://www.synology.com/en-us/products?product_line=ds_j,ds_value">Synology NAS</a> in my house, and my kids listen to music on it through the <a href="https://www.plex.tv/plexamp/">Plexamp app</a>, but I don’t because I still prefer using the iTunes/Apple Music desktop app 🤷‍♂️.</p></div></div><p>iTunes/Music keeps track of some song metadata, like a count of the number of times a song has been played:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure"><p><img src="img/itunes-metadata.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:80.0%"></p>
+</figure>
+</div>
+<p>All that metadata is stored in a big ol’ gross XML file. In days of iTunes, you could find it at <code>~/Music/iTunes/iTunes Library.xml</code>; with Apple Music, it’s hidden in <code>~/Music/Music/Music Library/Library.musicdb</code>. The easiest way to access it is to export a copy of it from Music with File &gt; Library &gt; Export Library…. It has a bunch of neat details about each file in your library:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode xml code-with-copy"><code class="sourceCode xml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>&lt;<span class="kw">key</span>&gt;34813&lt;/<span class="kw">key</span>&gt;</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>&lt;<span class="kw">dict</span>&gt;</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Track ID&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">integer</span>&gt;34813&lt;/<span class="kw">integer</span>&gt;</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Name&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">string</span>&gt;In Another Life&lt;/<span class="kw">string</span>&gt;</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Artist&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">string</span>&gt;The Killers&lt;/<span class="kw">string</span>&gt;</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Album Artist&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">string</span>&gt;The Killers&lt;/<span class="kw">string</span>&gt;</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Album&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">string</span>&gt;Pressure Machine&lt;/<span class="kw">string</span>&gt;</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Genre&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">string</span>&gt;Alternative Rock&lt;/<span class="kw">string</span>&gt;</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Kind&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">string</span>&gt;MPEG audio file&lt;/<span class="kw">string</span>&gt;</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Size&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">integer</span>&gt;7632215&lt;/<span class="kw">integer</span>&gt;</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Total Time&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">integer</span>&gt;225724&lt;/<span class="kw">integer</span>&gt;</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Disc Number&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">integer</span>&gt;1&lt;/<span class="kw">integer</span>&gt;</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Disc Count&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">integer</span>&gt;1&lt;/<span class="kw">integer</span>&gt;</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Track Number&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">integer</span>&gt;8&lt;/<span class="kw">integer</span>&gt;</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Track Count&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">integer</span>&gt;11&lt;/<span class="kw">integer</span>&gt;</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Year&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">integer</span>&gt;2021&lt;/<span class="kw">integer</span>&gt;</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Date Modified&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">date</span>&gt;2021-08-13T17:38:22Z&lt;/<span class="kw">date</span>&gt;</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Date Added&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">date</span>&gt;2021-08-13T13:38:36Z&lt;/<span class="kw">date</span>&gt;</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Bit Rate&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">integer</span>&gt;268&lt;/<span class="kw">integer</span>&gt;</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Sample Rate&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">integer</span>&gt;44100&lt;/<span class="kw">integer</span>&gt;</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Comments&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">string</span>&gt;Amazon.com Song ID: REDACTED&lt;/<span class="kw">string</span>&gt;</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Play Count&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">integer</span>&gt;97&lt;/<span class="kw">integer</span>&gt;</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Play Date&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">integer</span>&gt;3815892895&lt;/<span class="kw">integer</span>&gt;</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Play Date UTC&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">date</span>&gt;2024-12-01T15:14:55Z&lt;/<span class="kw">date</span>&gt;</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Rating&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">integer</span>&gt;100&lt;/<span class="kw">integer</span>&gt;</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Album Rating&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">integer</span>&gt;100&lt;/<span class="kw">integer</span>&gt;</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Album Rating Computed&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">true</span>/&gt;</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Normalization&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">integer</span>&gt;6230&lt;/<span class="kw">integer</span>&gt;</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Artwork Count&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">integer</span>&gt;1&lt;/<span class="kw">integer</span>&gt;</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Sort Album Artist&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">string</span>&gt;Killers&lt;/<span class="kw">string</span>&gt;</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Sort Artist&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">string</span>&gt;Killers&lt;/<span class="kw">string</span>&gt;</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Persistent ID&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">string</span>&gt;211319FB11435185&lt;/<span class="kw">string</span>&gt;</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Track Type&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">string</span>&gt;File&lt;/<span class="kw">string</span>&gt;</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Location&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">string</span>&gt;file:///Users/andrew/Music/iTunes/iTunes%20Music/Music/The%20Killers/Pressure%20Machine/08%20In%20Another%20Life.mp3&lt;/<span class="kw">string</span>&gt;</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;File Folder Count&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">integer</span>&gt;5&lt;/<span class="kw">integer</span>&gt;</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Library Folder Count&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">integer</span>&gt;1&lt;/<span class="kw">integer</span>&gt;</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>&lt;/<span class="kw">dict</span>&gt;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>It keeps track of play count…</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode xml code-with-copy"><code class="sourceCode xml"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Play Count&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">integer</span>&gt;97&lt;/<span class="kw">integer</span>&gt;</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Play Date&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">integer</span>&gt;3815892895&lt;/<span class="kw">integer</span>&gt;</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Play Date UTC&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">date</span>&gt;2024-12-01T15:14:55Z&lt;/<span class="kw">date</span>&gt;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>…but unfortunately for Spotify Wrapped purposes, it overwrites the count and date information when you listen to a track—it doesn’t keep track of individual play counts. Here’s what the XML for <a href="https://www.youtube.com/watch?v=DcBVc0moMS4">“In Another Life”</a> looked like before I listened to the track while writing this post:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode xml code-with-copy"><code class="sourceCode xml"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>&lt;<span class="kw">key</span>&gt;Play Count&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">integer</span>&gt;96&lt;/<span class="kw">integer</span>&gt;</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>&lt;<span class="kw">key</span>&gt;Play Date&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">integer</span>&gt;3808562446&lt;/<span class="kw">integer</span>&gt;</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>&lt;<span class="kw">key</span>&gt;Play Date UTC&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">date</span>&gt;2024-09-07T18:00:46Z&lt;/<span class="kw">date</span>&gt;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>That September 7th listen was erased from history once I hit play in December :(</p>
+<p>That means it’s impossible to figure out how many times you listen to a track during a given time period—the play count only shows the most recent listen. With one XML export, you can’t find Spotify Wrapped-like details about listening habits in a single year.</p>
+<p>However, if you have <em>two</em> XML exports, you can!</p>
+<section id="calculating-2024-play-counts-with-r" class="level2 page-columns page-full"><h2 class="anchored" data-anchor-id="calculating-2024-play-counts-with-r">Calculating 2024 play counts with R</h2>
+<p>I played the long game this year and exported a copy of my iTunes/Music library on the morning of January 1 and stored the XML file in a folder on my computer. I then exported a copy of the library as it stands today. With these two library files, I can subtract the play count from January 1 from the play count today and find how many times I listened to each track. It still doesn’t give me date information—there’s no way to see time trends like what I was listening to in March or whatever<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>—but it gives me good data to work with.</p>
+<div class="no-row-height column-margin column-container"><div id="fn2"><p><sup>2</sup>&nbsp;If I were super on top of things and cared that much, I could set up a script to automatically export a copy of the library every day and then reverse engineer daily listening data, but that seems like an excessive amount of work.</p></div></div><p>In the spirit of Caitlin’s tweet, I’m going to keep the analysis of this data as simple and straightforward as possible—just filtering, grouping, and summarizing.</p>
+<p>The only bit of fancy R work comes at the beginning with parsing and cleaning the Apple Music XML files. The track information is deeply nested inside a bunch of XML layers and untangling all that requires some data wrangling. Fortunatley Simon Couch already did it in <a href="https://www.simonpcouch.com/blog/2022-12-01-listening-2022/">his 2022 analysis of his music</a>, and he even made an <a href="https://github.com/simonpcouch/wrapped">accompanying package {wrapped}</a> for doing it yourself. His package is designed to extract the play counts of all the music <em>added</em> in a given year, while I want the counts for all years, so I modified his <code>wrap_library()</code> function slightly to ignore the year argument and just parse everything. The modified function, now <code>read_itunes_library()</code> is below, for the morbidly curious:</p>
+<div class="cell" data-layout-align="center">
+<details class="code-fold"><summary><strong>R code for <code>read_itunes_library()</code></strong></summary><div class="sourceCode" id="cb4"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Copied with tiiiiny modifications from Simon Couch's {wrapped}:</span></span>
+<span><span class="co">#</span></span>
+<span><span class="co"># - https://www.simonpcouch.com/blog/2022-12-01-listening-2022/</span></span>
+<span><span class="co"># - https://github.com/simonpcouch/wrapped/blob/main/R/wrap_library.R</span></span>
+<span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org">tidyverse</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">read_itunes_library</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">path</span>, <span class="va">year</span> <span class="op">=</span> <span class="fl">2022L</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">raw</span> <span class="op">&lt;-</span> <span class="fu">xml2</span><span class="fu">::</span><span class="fu"><a href="http://xml2.r-lib.org/reference/read_xml.html">read_xml</a></span><span class="op">(</span><span class="va">path</span><span class="op">)</span></span>
+<span>  </span>
+<span>  <span class="va">res</span> <span class="op">&lt;-</span> <span class="fu">xml2</span><span class="fu">::</span><span class="fu">as_list</span><span class="op">(</span><span class="va">raw</span><span class="op">)</span></span>
+<span>  </span>
+<span>  <span class="va">res</span> <span class="op">&lt;-</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu">pluck</span><span class="op">(</span><span class="va">res</span>, <span class="st">"plist"</span>, <span class="st">"dict"</span>, <span class="st">"dict"</span><span class="op">)</span></span>
+<span>  </span>
+<span>  <span class="va">res</span> <span class="op">&lt;-</span> <span class="va">res</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span> <span class="op">!=</span> <span class="st">"key"</span><span class="op">]</span></span>
+<span>  </span>
+<span>  <span class="va">res</span> <span class="op">&lt;-</span> </span>
+<span>    <span class="fu">tibble</span><span class="fu">::</span><span class="fu">enframe</span><span class="op">(</span><span class="va">res</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu">rowwise</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu">mutate</span><span class="op">(</span>value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu">tibble</span><span class="fu">::</span><span class="fu">enframe</span><span class="op">(</span><span class="va">value</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu">ungroup</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu">mutate</span><span class="op">(</span>id <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu">row_number</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu">select</span><span class="op">(</span><span class="op">-</span><span class="va">name</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>    <span class="fu">tidyr</span><span class="fu">::</span><span class="fu">unnest</span><span class="op">(</span><span class="va">value</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu">mutate</span><span class="op">(</span></span>
+<span>      entry_id <span class="op">=</span> <span class="op">(</span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu">row_number</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="op">(</span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu">row_number</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/Arithmetic.html">%%</a></span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="op">/</span> <span class="fl">2</span></span>
+<span>    <span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu">rowwise</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu">mutate</span><span class="op">(</span>value <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu">if_else</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">value</span><span class="op">)</span> <span class="op">==</span> <span class="fl">0L</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="cn">NA</span><span class="op">)</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="va">value</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>           value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unlist.html">unlist</a></span><span class="op">(</span><span class="va">value</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu">ungroup</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>    <span class="fu">tidyr</span><span class="fu">::</span><span class="fu">pivot_wider</span><span class="op">(</span>id_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">id</span>, <span class="va">entry_id</span><span class="op">)</span>, names_from <span class="op">=</span> <span class="va">name</span>, values_from <span class="op">=</span> <span class="va">value</span>, values_fn <span class="op">=</span> <span class="va">list</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>    <span class="fu">tidyr</span><span class="fu">::</span><span class="fu">pivot_longer</span><span class="op">(</span>cols <span class="op">=</span> <span class="fl">4</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">ncol</a></span><span class="op">(</span><span class="va">.</span><span class="op">)</span>, names_to <span class="op">=</span> <span class="st">"type"</span>, values_drop_na <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu">select</span><span class="op">(</span><span class="op">-</span><span class="va">type</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>    <span class="fu">tidyr</span><span class="fu">::</span><span class="fu">pivot_wider</span><span class="op">(</span>id_cols <span class="op">=</span> <span class="va">id</span>, names_from <span class="op">=</span> <span class="va">key</span>, values_from <span class="op">=</span> <span class="va">value</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>    <span class="fu">janitor</span><span class="fu">::</span><span class="fu">clean_names</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu">select</span><span class="op">(</span><span class="va">id</span>, track_title <span class="op">=</span> <span class="va">name</span>, <span class="va">artist</span>, <span class="va">album_artist</span>, <span class="va">album</span>, <span class="va">genre</span>, <span class="va">total_time</span>, <span class="va">date_added</span>, <span class="va">skip_count</span>, <span class="va">play_count</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu">rowwise</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu">mutate</span><span class="op">(</span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu">across</span><span class="op">(</span><span class="fu">everything</span><span class="op">(</span><span class="op">)</span>, <span class="op">~</span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu">if_else</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html">is.null</a></span><span class="op">(</span><span class="va">.x</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="cn">NA</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="va">.x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu">mutate</span><span class="op">(</span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu">across</span><span class="op">(</span><span class="fu">everything</span><span class="op">(</span><span class="op">)</span>, <span class="va">unlist</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu">mutate</span><span class="op">(</span></span>
+<span>      date_added <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/strsplit.html">strsplit</a></span><span class="op">(</span><span class="va">date_added</span>, <span class="st">"T"</span><span class="op">)</span>,</span>
+<span>      date_added <span class="op">=</span> <span class="va">date_added</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,</span>
+<span>      date_added <span class="op">=</span> <span class="fu">lubridate</span><span class="fu">::</span><span class="fu">ymd</span><span class="op">(</span><span class="va">date_added</span><span class="op">)</span>,</span>
+<span>      skip_count <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span><span class="op">(</span><span class="va">skip_count</span><span class="op">)</span>,</span>
+<span>      play_count <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span><span class="op">(</span><span class="va">play_count</span><span class="op">)</span>,</span>
+<span>      total_time <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span><span class="op">(</span><span class="va">total_time</span><span class="op">)</span></span>
+<span>    <span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu">ungroup</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>    <span class="co"># dplyr::filter(lubridate::year(date_added) %in% year) %&gt;%</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu">arrange</span><span class="op">(</span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu">desc</span><span class="op">(</span><span class="va">play_count</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="va">res</span></span>
+<span><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org">tidyverse</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Copy this function from the text earlier </span></span>
+<span><span class="va">read_itunes_library</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">...</span><span class="op">)</span> <span class="op">{</span><span class="va">...</span><span class="op">}</span></span>
+<span></span>
+<span><span class="va">music_january</span> <span class="op">&lt;-</span> <span class="fu">read_itunes_library</span><span class="op">(</span><span class="st">"Library_2024-01-01.xml"</span><span class="op">)</span></span>
+<span><span class="va">music_december</span> <span class="op">&lt;-</span> <span class="fu">read_itunes_library</span><span class="op">(</span><span class="st">"Library_2024-12-04.xml"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Here’s what that data looks like:<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a></p>
+<div class="no-row-height column-margin column-container"><div id="fn3"><p><sup>3</sup>&nbsp;My most recent Bandcamp purchases were the two Minecraft soundtracks (<a href="https://c418.bandcamp.com/album/minecraft-volume-alpha">Volume Alpha</a> and <a href="https://c418.bandcamp.com/album/minecraft-volume-beta">Volume Beta</a>) for my Minecraft-obsessed kids, hence those tracks in the <code>glimpse()</code> output there.</p></div></div><div class="cell" data-layout-align="center">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">glimpse</span><span class="op">(</span><span class="va">music_december</span><span class="op">)</span></span>
+<span><span class="co">## Rows: 11,691</span></span>
+<span><span class="co">## Columns: 10</span></span>
+<span><span class="co">## $ id           &lt;int&gt; 12138, 12135, 12136, 12137, 12139, 12140, 12141, 12142, 12143, 12144, 12145, 12146, 12147, 12148, 12149, 12150, 12151, 12152, 12153, 12154, 12155, 12156, 12157, 12158, 12159, 12160, 12161, 12162, 12163, 12164, 12165, 12166, 12167, 12168, 12169, 12170, 12171, 12172, 12173, 1217…</span></span>
+<span><span class="co">## $ track_title  &lt;chr&gt; "Living Mice", "Door", "Subwoofer Lullaby", "Death", "Moog City", "Haggstrom", "Minecraft", "Oxygène", "Équinoxe", "Mice on Venus", "Dry Hands", "Wet Hands", "Clark", "Chris", "Thirteen", "Excuse", "Sweden", "Key", "Cat", "Dog", "Danny", "Beginning", "Droopy likes ricochet", "…</span></span>
+<span><span class="co">## $ artist       &lt;chr&gt; "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418…</span></span>
+<span><span class="co">## $ album_artist &lt;chr&gt; "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418…</span></span>
+<span><span class="co">## $ album        &lt;chr&gt; "Minecraft - Volume Alpha", "Minecraft - Volume Alpha", "Minecraft - Volume Alpha", "Minecraft - Volume Alpha", "Minecraft - Volume Alpha", "Minecraft - Volume Alpha", "Minecraft - Volume Alpha", "Minecraft - Volume Alpha", "Minecraft - Volume Alpha", "Minecraft - Volume Alpha…</span></span>
+<span><span class="co">## $ genre        &lt;chr&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, "Classical", "Classical", "Classical", "Classical", "Classica…</span></span>
+<span><span class="co">## $ total_time   &lt;dbl&gt; 177554, 111490, 208640, 41560, 160052, 204068, 254066, 65201, 114938, 281573, 68571, 90070, 191817, 87823, 176561, 124055, 215562, 65071, 186305, 145815, 254563, 102164, 96287, 116819, 603062, 296071, 332564, 170396, 180062, 254249, 378122, 185077, 361743, 239438, 244950, 3100…</span></span>
+<span><span class="co">## $ date_added   &lt;date&gt; 2024-11-29, 2024-11-29, 2024-11-29, 2024-11-29, 2024-11-29, 2024-11-29, 2024-11-29, 2024-11-29, 2024-11-29, 2024-11-29, 2024-11-29, 2024-11-29, 2024-11-29, 2024-11-29, 2024-11-29, 2024-11-29, 2024-11-29, 2024-11-29, 2024-11-29, 2024-11-29, 2024-11-29, 2024-11-29, 2024-11-29, …</span></span>
+<span><span class="co">## $ skip_count   &lt;dbl&gt; NA, NA, 1, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, 1, NA, NA, NA, NA, NA, 1, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, 1, NA, NA, N…</span></span>
+<span><span class="co">## $ play_count   &lt;dbl&gt; 1, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>There are columns for iTunes/Music’s internal track ID, a bunch of track metadata like title, artist, album, genre, and date added, and columns for the skip count and play count. Those are all columns Simon decided to include with his {wrapper} package—if you modify the <code>read_itunes_library()</code> function from earlier, you can keep any of the metadata that Music keeps track of.</p>
+<p>With library data from both January and December loaded, I next combine them into one dataset with the total number of plays in 2024. This requires a tiny bit of data wrangling: I rename the play count column in the December data, join the January data to it, rename the January play count column, recode missing play counts as 0, and find the difference between play counts in December and January:</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">music_2024</span> <span class="op">&lt;-</span> <span class="va">music_december</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="co"># Rename the column of December play counts</span></span>
+<span>  <span class="fu">rename</span><span class="op">(</span>play_count_end <span class="op">=</span> <span class="va">play_count</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="co"># Merge in the play count column from the January 1 data</span></span>
+<span>  <span class="fu">left_join</span><span class="op">(</span></span>
+<span>    <span class="va">music_january</span> <span class="op">|&gt;</span> <span class="fu">select</span><span class="op">(</span><span class="va">id</span>, play_count_start <span class="op">=</span> <span class="va">play_count</span><span class="op">)</span>,</span>
+<span>    by <span class="op">=</span> <span class="fu">join_by</span><span class="op">(</span><span class="va">id</span><span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="co"># Tracks that were added in 2024 don't show up in music_january, so they appear </span></span>
+<span>  <span class="co"># in the merged data as NA. This recodes them as 0, which makes it so I can </span></span>
+<span>  <span class="co"># do math with them in the next step</span></span>
+<span>  <span class="fu">replace_na</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>play_count_start <span class="op">=</span> <span class="fl">0</span>, play_count_end <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="co"># Calculate the difference between December and January play counts</span></span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>play_count_2024 <span class="op">=</span> <span class="va">play_count_end</span> <span class="op">-</span> <span class="va">play_count_start</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Let’s see what the merged data looks like really quick:</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">glimpse</span><span class="op">(</span><span class="va">music_2024</span><span class="op">)</span></span>
+<span><span class="co">## Rows: 11,691</span></span>
+<span><span class="co">## Columns: 12</span></span>
+<span><span class="co">## $ id               &lt;int&gt; 12138, 12135, 12136, 12137, 12139, 12140, 12141, 12142, 12143, 12144, 12145, 12146, 12147, 12148, 12149, 12150, 12151, 12152, 12153, 12154, 12155, 12156, 12157, 12158, 12159, 12160, 12161, 12162, 12163, 12164, 12165, 12166, 12167, 12168, 12169, 12170, 12171, 12172, 12173, …</span></span>
+<span><span class="co">## $ track_title      &lt;chr&gt; "Living Mice", "Door", "Subwoofer Lullaby", "Death", "Moog City", "Haggstrom", "Minecraft", "Oxygène", "Équinoxe", "Mice on Venus", "Dry Hands", "Wet Hands", "Clark", "Chris", "Thirteen", "Excuse", "Sweden", "Key", "Cat", "Dog", "Danny", "Beginning", "Droopy likes ricochet…</span></span>
+<span><span class="co">## $ artist           &lt;chr&gt; "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "…</span></span>
+<span><span class="co">## $ album_artist     &lt;chr&gt; "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "C418", "…</span></span>
+<span><span class="co">## $ album            &lt;chr&gt; "Minecraft - Volume Alpha", "Minecraft - Volume Alpha", "Minecraft - Volume Alpha", "Minecraft - Volume Alpha", "Minecraft - Volume Alpha", "Minecraft - Volume Alpha", "Minecraft - Volume Alpha", "Minecraft - Volume Alpha", "Minecraft - Volume Alpha", "Minecraft - Volume A…</span></span>
+<span><span class="co">## $ genre            &lt;chr&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, "Classical", "Classical", "Classical", "Classical", "Clas…</span></span>
+<span><span class="co">## $ total_time       &lt;dbl&gt; 177554, 111490, 208640, 41560, 160052, 204068, 254066, 65201, 114938, 281573, 68571, 90070, 191817, 87823, 176561, 124055, 215562, 65071, 186305, 145815, 254563, 102164, 96287, 116819, 603062, 296071, 332564, 170396, 180062, 254249, 378122, 185077, 361743, 239438, 244950, …</span></span>
+<span><span class="co">## $ date_added       &lt;date&gt; 2024-11-29, 2024-11-29, 2024-11-29, 2024-11-29, 2024-11-29, 2024-11-29, 2024-11-29, 2024-11-29, 2024-11-29, 2024-11-29, 2024-11-29, 2024-11-29, 2024-11-29, 2024-11-29, 2024-11-29, 2024-11-29, 2024-11-29, 2024-11-29, 2024-11-29, 2024-11-29, 2024-11-29, 2024-11-29, 2024-11-…</span></span>
+<span><span class="co">## $ skip_count       &lt;dbl&gt; NA, NA, 1, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, 1, NA, NA, NA, NA, NA, 1, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, 1, NA, N…</span></span>
+<span><span class="co">## $ play_count_end   &lt;dbl&gt; 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 17, 16, 15, 15, 1…</span></span>
+<span><span class="co">## $ play_count_start &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …</span></span>
+<span><span class="co">## $ play_count_2024  &lt;dbl&gt; 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 17, 16, 15, 15, 1…</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>That new <code>play_count_2024</code> column is the main thing I’m interested in—I can summarize it a bunch of different ways.</p>
+</section><section id="minutes-listened" class="level2"><h2 class="anchored" data-anchor-id="minutes-listened">Minutes listened</h2>
+<p>There’s a column for <code>total_time</code> that’s measured in milliseconds. I can multiply it by the play count and do some division to figure out a rough count of the total number of minutes listened. It’s not 100% accurate since it doesn’t account for partial listens, but it’s close enough.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">music_2024</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>time_plays <span class="op">=</span> <span class="va">total_time</span> <span class="op">*</span> <span class="va">play_count_2024</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">summarize</span><span class="op">(</span>total_ms <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">time_plays</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>total_minutes <span class="op">=</span> <span class="va">total_ms</span> <span class="op">/</span> <span class="fl">1000</span> <span class="op">/</span> <span class="fl">60</span><span class="op">)</span></span>
+<span><span class="co">## # A tibble: 1 × 2</span></span>
+<span><span class="co">##    total_ms total_minutes</span></span>
+<span><span class="co">##       &lt;dbl&gt;         &lt;dbl&gt;</span></span>
+<span><span class="co">## 1 891497777        14858.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section><section id="new-music" class="level2"><h2 class="anchored" data-anchor-id="new-music">New music</h2>
+<p>Here’s all the new music I added in 2024:</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">added_2024</span> <span class="op">&lt;-</span> <span class="va">music_2024</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>year_added <span class="op">=</span> <span class="fu">year</span><span class="op">(</span><span class="va">date_added</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">year_added</span> <span class="op">==</span> <span class="fl">2024</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">distinct</span><span class="op">(</span><span class="va">album_artist</span>, <span class="va">album</span>, <span class="va">date_added</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">added_2024</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">arrange</span><span class="op">(</span><span class="va">date_added</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span>n <span class="op">=</span> <span class="cn">Inf</span><span class="op">)</span></span>
+<span><span class="co">## # A tibble: 30 × 3</span></span>
+<span><span class="co">##    album_artist       album                                                                                   date_added</span></span>
+<span><span class="co">##    &lt;chr&gt;              &lt;chr&gt;                                                                                   &lt;date&gt;    </span></span>
+<span><span class="co">##  1 boygenius          the record [Explicit]                                                                   2024-02-05</span></span>
+<span><span class="co">##  2 Olivia Rodrigo     GUTS (spilled) [Explicit]                                                               2024-03-23</span></span>
+<span><span class="co">##  3 The Avett Brothers The Avett Brothers                                                                      2024-03-23</span></span>
+<span><span class="co">##  4 The Decemberists   As It Ever Was, So It Will Be Again                                                     2024-03-23</span></span>
+<span><span class="co">##  5 Lauren Mayberry    Change Shapes                                                                           2024-03-23</span></span>
+<span><span class="co">##  6 Lauren Mayberry    Shame                                                                                   2024-03-23</span></span>
+<span><span class="co">##  7 Nils Frahm         Day                                                                                     2024-04-09</span></span>
+<span><span class="co">##  8 Taylor Swift       THE TORTURED POETS DEPARTMENT: THE ANTHOLOGY [Explicit]                                 2024-04-19</span></span>
+<span><span class="co">##  9 Taylor Swift       THE TORTURED POETS DEPARTMENT [Explicit]                                                2024-04-19</span></span>
+<span><span class="co">## 10 The Avett Brothers The Avett Brothers                                                                      2024-05-17</span></span>
+<span><span class="co">## 11 Lindsey Stirling   Duality                                                                                 2024-06-18</span></span>
+<span><span class="co">## 12 The Decemberists   As It Ever Was, So It Will Be Again                                                     2024-06-18</span></span>
+<span><span class="co">## 13 Bits &amp; Hits        Lord of The Rings but it's lofi beats                                                   2024-07-28</span></span>
+<span><span class="co">## 14 Bits &amp; Hits        Zelda but it's lofi beats                                                               2024-07-28</span></span>
+<span><span class="co">## 15 Bits &amp; Hits        Minecraft but it's lofi beats                                                           2024-07-28</span></span>
+<span><span class="co">## 16 Sabrina Carpenter  Short n' Sweet [Explicit]                                                               2024-08-05</span></span>
+<span><span class="co">## 17 Chappell Roan      The Rise and Fall of a Midwest Princess [Explicit]                                      2024-08-13</span></span>
+<span><span class="co">## 18 Sabrina Carpenter  Short n' Sweet [Explicit]                                                               2024-08-23</span></span>
+<span><span class="co">## 19 Eydís Evensen      The Light                                                                               2024-09-25</span></span>
+<span><span class="co">## 20 Bear McCreary      The Lord of the Rings: The Rings of Power (Season 2: Amazon Original Series Soundtrack) 2024-10-07</span></span>
+<span><span class="co">## 21 Dua Lipa           Radical Optimism [Explicit]                                                             2024-10-27</span></span>
+<span><span class="co">## 22 Laufey             Bewitched: The Goddess Edition [Explicit]                                               2024-11-05</span></span>
+<span><span class="co">## 23 Laufey             Everything I Know About Love                                                            2024-11-05</span></span>
+<span><span class="co">## 24 Laufey             Typical of Me EP                                                                        2024-11-05</span></span>
+<span><span class="co">## 25 Laufey             Bewitched                                                                               2024-11-05</span></span>
+<span><span class="co">## 26 Anna Lapwood       Images                                                                                  2024-11-11</span></span>
+<span><span class="co">## 27 Anna Lapwood       Luna                                                                                    2024-11-11</span></span>
+<span><span class="co">## 28 Chappell Roan      Good Luck, Babe!                                                                        2024-11-11</span></span>
+<span><span class="co">## 29 C418               Minecraft - Volume Alpha                                                                2024-11-29</span></span>
+<span><span class="co">## 30 C418               Minecraft - Volume Beta                                                                 2024-11-29</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section><section id="top-songs" class="level2"><h2 class="anchored" data-anchor-id="top-songs">Top songs</h2>
+<p>And here are the top songs:</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">top_played</span> <span class="op">&lt;-</span> <span class="va">music_2024</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">select</span><span class="op">(</span><span class="va">track_title</span>, <span class="va">artist</span>, <span class="va">play_count_2024</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">arrange</span><span class="op">(</span><span class="fu">desc</span><span class="op">(</span><span class="va">play_count_2024</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">top_played</span></span>
+<span><span class="co">## # A tibble: 11,691 × 3</span></span>
+<span><span class="co">##    track_title                                   artist                                       play_count_2024</span></span>
+<span><span class="co">##    &lt;chr&gt;                                         &lt;chr&gt;                                                  &lt;dbl&gt;</span></span>
+<span><span class="co">##  1 love is embarrassing [Explicit]               Olivia Rodrigo                                            42</span></span>
+<span><span class="co">##  2 New Romantics (Taylor's Version)              Taylor Swift                                              35</span></span>
+<span><span class="co">##  3 Dreaming of Light                             Eydís Evensen                                             33</span></span>
+<span><span class="co">##  4 Espresso [Explicit]                           Sabrina Carpenter                                         32</span></span>
+<span><span class="co">##  5 Bewitched                                     Laufey                                                    31</span></span>
+<span><span class="co">##  6 Please Please Please [Explicit]               Sabrina Carpenter                                         30</span></span>
+<span><span class="co">##  7 Anna's Theme                                  Eydís Evensen                                             26</span></span>
+<span><span class="co">##  8 All You Had To Do Was Stay (Taylor's Version) Taylor Swift                                              26</span></span>
+<span><span class="co">##  9 Shake It Off (Taylor's Version)               Taylor Swift                                              26</span></span>
+<span><span class="co">## 10 The Light II                                  Eydís Evensen;Schola Cantorum Reykjavicensis              23</span></span>
+<span><span class="co">## # ℹ 11,681 more rows</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section><section id="top-artists" class="level2"><h2 class="anchored" data-anchor-id="top-artists">Top artists</h2>
+<p>And the top artists:</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">top_artists</span> <span class="op">&lt;-</span> <span class="va">music_2024</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">group_by</span><span class="op">(</span><span class="va">artist</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">summarize</span><span class="op">(</span>play_count <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">play_count_2024</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">arrange</span><span class="op">(</span><span class="fu">desc</span><span class="op">(</span><span class="va">play_count</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">top_artists</span></span>
+<span><span class="co">## # A tibble: 1,851 × 2</span></span>
+<span><span class="co">##    artist             play_count</span></span>
+<span><span class="co">##    &lt;chr&gt;                   &lt;dbl&gt;</span></span>
+<span><span class="co">##  1 Taylor Swift              484</span></span>
+<span><span class="co">##  2 Laufey                    384</span></span>
+<span><span class="co">##  3 Olivia Rodrigo            281</span></span>
+<span><span class="co">##  4 Eydís Evensen             249</span></span>
+<span><span class="co">##  5 Bear McCreary             234</span></span>
+<span><span class="co">##  6 The Decemberists          214</span></span>
+<span><span class="co">##  7 Hans Zimmer               188</span></span>
+<span><span class="co">##  8 Sabrina Carpenter         151</span></span>
+<span><span class="co">##  9 The Avett Brothers        149</span></span>
+<span><span class="co">## 10 Nicholas Britell          148</span></span>
+<span><span class="co">## # ℹ 1,841 more rows</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section><section id="top-albums" class="level2"><h2 class="anchored" data-anchor-id="top-albums">Top albums</h2>
+<p>And the top albums. This is a little trickier since Music doesn’t keep track of full album listens (and I don’t think Spotify does that either), so it’s a count of the number of tracks played in the album. That means the count is biased towards longer albums like <em>1989</em> (21 tracks) or the <em>Rings of Power</em> soundtrack (40 tracks). But it’s still a helpful overview:</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">top_albums</span> <span class="op">&lt;-</span> <span class="va">music_2024</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">group_by</span><span class="op">(</span><span class="va">album</span>, <span class="va">artist</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">summarize</span><span class="op">(</span>count_of_tracks_played_in_album <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">play_count_2024</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">arrange</span><span class="op">(</span><span class="fu">desc</span><span class="op">(</span><span class="va">count_of_tracks_played_in_album</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">top_albums</span></span>
+<span><span class="co">## # A tibble: 2,434 × 3</span></span>
+<span><span class="co">## # Groups:   album [992]</span></span>
+<span><span class="co">##    album                                                                                     artist             count_of_tracks_played_in_album</span></span>
+<span><span class="co">##    &lt;chr&gt;                                                                                     &lt;chr&gt;                                        &lt;dbl&gt;</span></span>
+<span><span class="co">##  1 1989 (Taylor's Version)                                                                   Taylor Swift                                   399</span></span>
+<span><span class="co">##  2 GUTS (spilled) [Explicit]                                                                 Olivia Rodrigo                                 336</span></span>
+<span><span class="co">##  3 Bewitched: The Goddess Edition [Explicit]                                                 Laufey                                         244</span></span>
+<span><span class="co">##  4 The Light                                                                                 Eydís Evensen                                  216</span></span>
+<span><span class="co">##  5 Short n' Sweet [Explicit]                                                                 Sabrina Carpenter                              151</span></span>
+<span><span class="co">##  6 The Lord of the Rings: The Rings of Power (Season One: Amazon Original Series Soundtrack) Bear McCreary                                  131</span></span>
+<span><span class="co">##  7 Interstellar: Original Motion Picture Soundtrack (Deluxe Version)                         Hans Zimmer                                    108</span></span>
+<span><span class="co">##  8 The Lord of the Rings: The Rings of Power (Season 2: Amazon Original Series Soundtrack)   Bear McCreary                                  103</span></span>
+<span><span class="co">##  9 The Avett Brothers                                                                        The Avett Brothers                              93</span></span>
+<span><span class="co">## 10 8th Wonder                                                                                The National Parks                              84</span></span>
+<span><span class="co">## # ℹ 2,424 more rows</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section><section id="final-images" class="level2 page-columns page-full"><h2 class="anchored" data-anchor-id="final-images">Final images</h2>
+<p>This is all ugly console output, so finally, I whipped up a couple Wrapped-esque images in Illustrator with the statistics;</p>
+<div class="quarto-figure quarto-figure-center page-columns page-full">
+<figure class="figure page-columns page-full"><p><img src="img/apple-music-wrapped-summary.png" class="img-fluid figure-img" style="width:80.0%"></p>
+<figcaption class="margin-caption">Top artists and total mintues</figcaption></figure>
+</div>
+<div class="quarto-figure quarto-figure-center page-columns page-full">
+<figure class="figure page-columns page-full"><p><img src="img/apple-music-wrapped-top-songs.png" class="img-fluid figure-img" style="width:80.0%"></p>
+<figcaption class="margin-caption">Top songs</figcaption></figure>
+</div>
+
+
+<!-- -->
+
+</section><div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{heiss2024,
+  author = {Heiss, Andrew},
+  title = {Apple {Music} {Wrapped} with {R}},
+  date = {2024-12-04},
+  url = {https://www.andrewheiss.com/blog/2024/12/04/apple-music-wrapped-r/},
+  doi = {10.59350/64kxj-xp130},
+  langid = {en}
+}
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-heiss2024" class="csl-entry quarto-appendix-citeas" role="listitem">
+Heiss, Andrew. 2024. <span>“Apple Music Wrapped with R.”</span> December
+4, 2024. <a href="https://doi.org/10.59350/64kxj-xp130">https://doi.org/10.59350/64kxj-xp130</a>.
+</div></div></section></div></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+  const viewSource = window.document.getElementById('quarto-view-source') ||
+                     window.document.getElementById('quarto-code-tools-source');
+  if (viewSource) {
+    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+    viewSource.addEventListener("click", function(e) {
+      if (sourceUrl) {
+        // rstudio viewer pane
+        if (/\bcapabilities=\b/.test(window.location)) {
+          window.open(sourceUrl);
+        } else {
+          window.location.href = sourceUrl;
+        }
+      } else {
+        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+        modal.show();
+      }
+      return false;
+    });
+  }
+  function toggleCodeHandler(show) {
+    return function(e) {
+      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+      for (let i=0; i<detailsSrc.length; i++) {
+        const details = detailsSrc[i].parentElement;
+        if (show) {
+          details.open = true;
+        } else {
+          details.removeAttribute("open");
+        }
+      }
+      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+      const fromCls = show ? "hidden" : "unhidden";
+      const toCls = show ? "unhidden" : "hidden";
+      for (let i=0; i<cellCodeDivs.length; i++) {
+        const codeDiv = cellCodeDivs[i];
+        if (codeDiv.classList.contains(fromCls)) {
+          codeDiv.classList.remove(fromCls);
+          codeDiv.classList.add(toCls);
+        } 
+      }
+      return false;
+    }
+  }
+  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+  if (hideAllCode) {
+    hideAllCode.addEventListener("click", toggleCodeHandler(false));
+  }
+  const showAllCode = window.document.getElementById("quarto-show-all-code");
+  if (showAllCode) {
+    showAllCode.addEventListener("click", toggleCodeHandler(true));
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/www\.andrewheiss\.com");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script><script src="https://giscus.app/client.js" data-repo="andrewheiss/ath-quarto" data-repo-id="R_kgDOIg6EJQ" data-category="Blog comments" data-category-id="DIC_kwDOIg6EJc4CSz92" data-mapping="pathname" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="top" data-theme="light" data-lang="en" crossorigin="anonymous" async="">
+</script><input type="hidden" id="giscus-base-theme" value="light"><input type="hidden" id="giscus-alt-theme" value="dark"><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="sourceCode" id="cb14" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Apple Music Wrapped with R"</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="an">date:</span><span class="co"> 2024-12-04</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="an">description:</span><span class="co"> "Use R to parse Apple Music XML files and create your own Spotify Wrapped-like stats"</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="an">image:</span><span class="co"> "img/social-image.png"</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="an">twitter-card:</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="co">  image: "img/social-image.png"</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="an">open-graph:</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="co">  image: "img/social-image.png"</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="an">categories:</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="co">  - r</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="co">  - tidyverse</span></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a><span class="co">  - music</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a><span class="an">doi:</span><span class="co"> 10.59350/64kxj-xp130</span></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a><span class="an">citation:</span><span class="co"> true</span></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a><span class="an">shift-heading-level-by:</span><span class="co"> 1</span></span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: setup</span></span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a><span class="co">#| include: false</span></span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span>opts_chunk<span class="sc">$</span><span class="fu">set</span>(</span>
+<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a>  <span class="at">fig.width =</span> <span class="dv">6</span>,</span>
+<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a>  <span class="at">fig.height =</span> <span class="dv">6</span> <span class="sc">*</span> <span class="fl">0.618</span>,</span>
+<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a>  <span class="at">fig.retina =</span> <span class="dv">3</span>,</span>
+<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a>  <span class="at">dev =</span> <span class="st">"ragg_png"</span>,</span>
+<span id="cb14-30"><a href="#cb14-30" aria-hidden="true" tabindex="-1"></a>  <span class="at">fig.align =</span> <span class="st">"center"</span>,</span>
+<span id="cb14-31"><a href="#cb14-31" aria-hidden="true" tabindex="-1"></a>  <span class="at">collapse =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb14-32"><a href="#cb14-32" aria-hidden="true" tabindex="-1"></a>  <span class="at">out.width =</span> <span class="st">"95%"</span>,</span>
+<span id="cb14-33"><a href="#cb14-33" aria-hidden="true" tabindex="-1"></a>  <span class="at">warning =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb14-34"><a href="#cb14-34" aria-hidden="true" tabindex="-1"></a>  <span class="at">cache.extra =</span> <span class="dv">1234</span>  <span class="co"># Change number to invalidate cache</span></span>
+<span id="cb14-35"><a href="#cb14-35" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb14-36"><a href="#cb14-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-37"><a href="#cb14-37" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(</span>
+<span id="cb14-38"><a href="#cb14-38" aria-hidden="true" tabindex="-1"></a>  <span class="at">digits =</span> <span class="dv">4</span>,</span>
+<span id="cb14-39"><a href="#cb14-39" aria-hidden="true" tabindex="-1"></a>  <span class="at">width =</span> <span class="dv">300</span></span>
+<span id="cb14-40"><a href="#cb14-40" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb14-41"><a href="#cb14-41" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-42"><a href="#cb14-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-43"><a href="#cb14-43" aria-hidden="true" tabindex="-1"></a>'Tis the season for Spotify Wrapped stats and I love it, both for seeing what everyone listens to and because it's such a cool way of presenting data. A few years ago on Twitter, <span class="co">[</span><span class="ot">Caitlin</span><span class="co">](https://bsky.app/profile/beeonaposy.bsky.social)</span> <span class="co">[</span><span class="ot">Hudon</span><span class="co">](https://www.caitlinhudon.com/)</span> noted that </span>
+<span id="cb14-44"><a href="#cb14-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-45"><a href="#cb14-45" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; Spotify Wrapped is a great example of how you can build a fantastic data product without maching learning or AI. (</span><span class="co">[</span><span class="ot">\@beeonaposy</span><span class="co">](https://x.com/beeonaposy/status/1334203860345208832?lang=en)</span><span class="at">)</span></span>
+<span id="cb14-46"><a href="#cb14-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-47"><a href="#cb14-47" aria-hidden="true" tabindex="-1"></a><span class="al">![](img/caitlin-tweet.png)</span>{width="70%" fig-align="center"}</span>
+<span id="cb14-48"><a href="#cb14-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-49"><a href="#cb14-49" aria-hidden="true" tabindex="-1"></a>At its core, Spotify Wrapped is really just some grouped and summarized data—a <span class="co">[</span><span class="ot">PivotTable</span><span class="co">](https://en.wikipedia.org/wiki/Pivot_table)</span> with some album cover art slapped on. And it's fun and neat and everyone loves it!</span>
+<span id="cb14-50"><a href="#cb14-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-51"><a href="#cb14-51" aria-hidden="true" tabindex="-1"></a>I've always been jealous of everyone's annual Spotify Wrapped reports, but since I don't use Spotify, <span class="co">[</span><span class="ot">I've never gotten to see my own details</span><span class="co">](https://bsky.app/profile/andrew.heiss.phd/post/3kfe3pe32jm2g)</span>.</span>
+<span id="cb14-52"><a href="#cb14-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-53"><a href="#cb14-53" aria-hidden="true" tabindex="-1"></a><span class="al">![](img/me-bluesky-post.png)</span>{width="80%" fig-align="center"}</span>
+<span id="cb14-54"><a href="#cb14-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-55"><a href="#cb14-55" aria-hidden="true" tabindex="-1"></a>Because I'm an Elder Millennial and started listening to music in the days of Napster, I prefer to control my music files rather than stream it Spotify-style, so I get all my stuff from either the Amazon Music store or <span class="co">[</span><span class="ot">Bandcamp</span><span class="co">](https://bandcamp.com/)</span> since they both provide DRM-free MP3s. I listen to everything in the used-to-be-iTunes Music app (not to be confused with Apple's music streaming service, Apple Music), and I use <span class="co">[</span><span class="ot">iTunes Match</span><span class="co">](https://support.apple.com/en-us/108935)</span> to access my library across all my devices.^<span class="co">[</span><span class="ot">I also have it all backed up to a [Plex](https://www.plex.tv/) server on a [Synology NAS](https://www.synology.com/en-us/products?product_line=ds_j,ds_value) in my house, and my kids listen to music on it through the [Plexamp app](https://www.plex.tv/plexamp/), but I don't because I still prefer using the iTunes/Apple Music desktop app 🤷‍♂️.</span><span class="co">]</span></span>
+<span id="cb14-56"><a href="#cb14-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-57"><a href="#cb14-57" aria-hidden="true" tabindex="-1"></a>iTunes/Music keeps track of some song metadata, like a count of the number of times a song has been played:</span>
+<span id="cb14-58"><a href="#cb14-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-59"><a href="#cb14-59" aria-hidden="true" tabindex="-1"></a><span class="al">![](img/itunes-metadata.png)</span>{width="80%" fig-align="center"}</span>
+<span id="cb14-60"><a href="#cb14-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-61"><a href="#cb14-61" aria-hidden="true" tabindex="-1"></a>All that metadata is stored in a big ol' gross XML file. In days of iTunes, you could find it at <span class="in">`~/Music/iTunes/iTunes Library.xml`</span>; with Apple Music, it's hidden in <span class="in">`~/Music/Music/Music Library/Library.musicdb`</span>. The easiest way to access it is to export a copy of it from Music with File &gt; Library &gt; Export Library…. It has a bunch of neat details about each file in your library:</span>
+<span id="cb14-62"><a href="#cb14-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-63"><a href="#cb14-63" aria-hidden="true" tabindex="-1"></a><span class="in">```xml</span></span>
+<span id="cb14-64"><a href="#cb14-64" aria-hidden="true" tabindex="-1"></a>&lt;<span class="kw">key</span>&gt;34813&lt;/<span class="kw">key</span>&gt;</span>
+<span id="cb14-65"><a href="#cb14-65" aria-hidden="true" tabindex="-1"></a>&lt;<span class="kw">dict</span>&gt;</span>
+<span id="cb14-66"><a href="#cb14-66" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Track ID&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">integer</span>&gt;34813&lt;/<span class="kw">integer</span>&gt;</span>
+<span id="cb14-67"><a href="#cb14-67" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Name&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">string</span>&gt;In Another Life&lt;/<span class="kw">string</span>&gt;</span>
+<span id="cb14-68"><a href="#cb14-68" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Artist&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">string</span>&gt;The Killers&lt;/<span class="kw">string</span>&gt;</span>
+<span id="cb14-69"><a href="#cb14-69" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Album Artist&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">string</span>&gt;The Killers&lt;/<span class="kw">string</span>&gt;</span>
+<span id="cb14-70"><a href="#cb14-70" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Album&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">string</span>&gt;Pressure Machine&lt;/<span class="kw">string</span>&gt;</span>
+<span id="cb14-71"><a href="#cb14-71" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Genre&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">string</span>&gt;Alternative Rock&lt;/<span class="kw">string</span>&gt;</span>
+<span id="cb14-72"><a href="#cb14-72" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Kind&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">string</span>&gt;MPEG audio file&lt;/<span class="kw">string</span>&gt;</span>
+<span id="cb14-73"><a href="#cb14-73" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Size&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">integer</span>&gt;7632215&lt;/<span class="kw">integer</span>&gt;</span>
+<span id="cb14-74"><a href="#cb14-74" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Total Time&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">integer</span>&gt;225724&lt;/<span class="kw">integer</span>&gt;</span>
+<span id="cb14-75"><a href="#cb14-75" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Disc Number&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">integer</span>&gt;1&lt;/<span class="kw">integer</span>&gt;</span>
+<span id="cb14-76"><a href="#cb14-76" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Disc Count&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">integer</span>&gt;1&lt;/<span class="kw">integer</span>&gt;</span>
+<span id="cb14-77"><a href="#cb14-77" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Track Number&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">integer</span>&gt;8&lt;/<span class="kw">integer</span>&gt;</span>
+<span id="cb14-78"><a href="#cb14-78" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Track Count&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">integer</span>&gt;11&lt;/<span class="kw">integer</span>&gt;</span>
+<span id="cb14-79"><a href="#cb14-79" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Year&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">integer</span>&gt;2021&lt;/<span class="kw">integer</span>&gt;</span>
+<span id="cb14-80"><a href="#cb14-80" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Date Modified&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">date</span>&gt;2021-08-13T17:38:22Z&lt;/<span class="kw">date</span>&gt;</span>
+<span id="cb14-81"><a href="#cb14-81" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Date Added&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">date</span>&gt;2021-08-13T13:38:36Z&lt;/<span class="kw">date</span>&gt;</span>
+<span id="cb14-82"><a href="#cb14-82" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Bit Rate&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">integer</span>&gt;268&lt;/<span class="kw">integer</span>&gt;</span>
+<span id="cb14-83"><a href="#cb14-83" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Sample Rate&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">integer</span>&gt;44100&lt;/<span class="kw">integer</span>&gt;</span>
+<span id="cb14-84"><a href="#cb14-84" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Comments&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">string</span>&gt;Amazon.com Song ID: REDACTED&lt;/<span class="kw">string</span>&gt;</span>
+<span id="cb14-85"><a href="#cb14-85" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Play Count&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">integer</span>&gt;97&lt;/<span class="kw">integer</span>&gt;</span>
+<span id="cb14-86"><a href="#cb14-86" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Play Date&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">integer</span>&gt;3815892895&lt;/<span class="kw">integer</span>&gt;</span>
+<span id="cb14-87"><a href="#cb14-87" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Play Date UTC&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">date</span>&gt;2024-12-01T15:14:55Z&lt;/<span class="kw">date</span>&gt;</span>
+<span id="cb14-88"><a href="#cb14-88" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Rating&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">integer</span>&gt;100&lt;/<span class="kw">integer</span>&gt;</span>
+<span id="cb14-89"><a href="#cb14-89" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Album Rating&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">integer</span>&gt;100&lt;/<span class="kw">integer</span>&gt;</span>
+<span id="cb14-90"><a href="#cb14-90" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Album Rating Computed&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">true</span>/&gt;</span>
+<span id="cb14-91"><a href="#cb14-91" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Normalization&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">integer</span>&gt;6230&lt;/<span class="kw">integer</span>&gt;</span>
+<span id="cb14-92"><a href="#cb14-92" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Artwork Count&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">integer</span>&gt;1&lt;/<span class="kw">integer</span>&gt;</span>
+<span id="cb14-93"><a href="#cb14-93" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Sort Album Artist&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">string</span>&gt;Killers&lt;/<span class="kw">string</span>&gt;</span>
+<span id="cb14-94"><a href="#cb14-94" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Sort Artist&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">string</span>&gt;Killers&lt;/<span class="kw">string</span>&gt;</span>
+<span id="cb14-95"><a href="#cb14-95" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Persistent ID&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">string</span>&gt;211319FB11435185&lt;/<span class="kw">string</span>&gt;</span>
+<span id="cb14-96"><a href="#cb14-96" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Track Type&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">string</span>&gt;File&lt;/<span class="kw">string</span>&gt;</span>
+<span id="cb14-97"><a href="#cb14-97" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Location&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">string</span>&gt;file:///Users/andrew/Music/iTunes/iTunes%20Music/Music/The%20Killers/Pressure%20Machine/08%20In%20Another%20Life.mp3&lt;/<span class="kw">string</span>&gt;</span>
+<span id="cb14-98"><a href="#cb14-98" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;File Folder Count&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">integer</span>&gt;5&lt;/<span class="kw">integer</span>&gt;</span>
+<span id="cb14-99"><a href="#cb14-99" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Library Folder Count&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">integer</span>&gt;1&lt;/<span class="kw">integer</span>&gt;</span>
+<span id="cb14-100"><a href="#cb14-100" aria-hidden="true" tabindex="-1"></a>&lt;/<span class="kw">dict</span>&gt;</span>
+<span id="cb14-101"><a href="#cb14-101" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-102"><a href="#cb14-102" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-103"><a href="#cb14-103" aria-hidden="true" tabindex="-1"></a>It keeps track of play count…</span>
+<span id="cb14-104"><a href="#cb14-104" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-105"><a href="#cb14-105" aria-hidden="true" tabindex="-1"></a><span class="in">```xml</span></span>
+<span id="cb14-106"><a href="#cb14-106" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Play Count&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">integer</span>&gt;97&lt;/<span class="kw">integer</span>&gt;</span>
+<span id="cb14-107"><a href="#cb14-107" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Play Date&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">integer</span>&gt;3815892895&lt;/<span class="kw">integer</span>&gt;</span>
+<span id="cb14-108"><a href="#cb14-108" aria-hidden="true" tabindex="-1"></a>    &lt;<span class="kw">key</span>&gt;Play Date UTC&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">date</span>&gt;2024-12-01T15:14:55Z&lt;/<span class="kw">date</span>&gt;</span>
+<span id="cb14-109"><a href="#cb14-109" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-110"><a href="#cb14-110" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-111"><a href="#cb14-111" aria-hidden="true" tabindex="-1"></a>…but unfortunately for Spotify Wrapped purposes, it overwrites the count and date information when you listen to a track—it doesn't keep track of individual play counts. Here's what the XML for <span class="co">[</span><span class="ot">"In Another Life"</span><span class="co">](https://www.youtube.com/watch?v=DcBVc0moMS4)</span> looked like before I listened to the track while writing this post:</span>
+<span id="cb14-112"><a href="#cb14-112" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-113"><a href="#cb14-113" aria-hidden="true" tabindex="-1"></a><span class="in">```xml</span></span>
+<span id="cb14-114"><a href="#cb14-114" aria-hidden="true" tabindex="-1"></a>&lt;<span class="kw">key</span>&gt;Play Count&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">integer</span>&gt;96&lt;/<span class="kw">integer</span>&gt;</span>
+<span id="cb14-115"><a href="#cb14-115" aria-hidden="true" tabindex="-1"></a>&lt;<span class="kw">key</span>&gt;Play Date&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">integer</span>&gt;3808562446&lt;/<span class="kw">integer</span>&gt;</span>
+<span id="cb14-116"><a href="#cb14-116" aria-hidden="true" tabindex="-1"></a>&lt;<span class="kw">key</span>&gt;Play Date UTC&lt;/<span class="kw">key</span>&gt;&lt;<span class="kw">date</span>&gt;2024-09-07T18:00:46Z&lt;/<span class="kw">date</span>&gt;</span>
+<span id="cb14-117"><a href="#cb14-117" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-118"><a href="#cb14-118" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-119"><a href="#cb14-119" aria-hidden="true" tabindex="-1"></a>That September 7th listen was erased from history once I hit play in December :(</span>
+<span id="cb14-120"><a href="#cb14-120" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-121"><a href="#cb14-121" aria-hidden="true" tabindex="-1"></a>That means it's impossible to figure out how many times you listen to a track during a given time period—the play count only shows the most recent listen. With one XML export, you can't find Spotify Wrapped-like details about listening habits in a single year.</span>
+<span id="cb14-122"><a href="#cb14-122" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-123"><a href="#cb14-123" aria-hidden="true" tabindex="-1"></a>However, if you have *two* XML exports, you can!</span>
+<span id="cb14-124"><a href="#cb14-124" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-125"><a href="#cb14-125" aria-hidden="true" tabindex="-1"></a><span class="fu"># Calculating 2024 play counts with R</span></span>
+<span id="cb14-126"><a href="#cb14-126" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-127"><a href="#cb14-127" aria-hidden="true" tabindex="-1"></a>I played the long game this year and exported a copy of my iTunes/Music library on the morning of January 1 and stored the XML file in a folder on my computer. I then exported a copy of the library as it stands today. With these two library files, I can subtract the play count from January 1 from the play count today and find how many times I listened to each track. It still doesn't give me date information—there's no way to see time trends like what I was listening to in March or whatever^<span class="co">[</span><span class="ot">If I were super on top of things and cared that much, I could set up a script to automatically export a copy of the library every day and then reverse engineer daily listening data, but that seems like an excessive amount of work.</span><span class="co">]</span>—but it gives me good data to work with.</span>
+<span id="cb14-128"><a href="#cb14-128" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-129"><a href="#cb14-129" aria-hidden="true" tabindex="-1"></a>In the spirit of Caitlin's tweet, I'm going to keep the analysis of this data as simple and straightforward as possible—just filtering, grouping, and summarizing.</span>
+<span id="cb14-130"><a href="#cb14-130" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-131"><a href="#cb14-131" aria-hidden="true" tabindex="-1"></a>The only bit of fancy R work comes at the beginning with parsing and cleaning the Apple Music XML files. The track information is deeply nested inside a bunch of XML layers and untangling all that requires some data wrangling. Fortunatley Simon Couch already did it in <span class="co">[</span><span class="ot">his 2022 analysis of his music</span><span class="co">](https://www.simonpcouch.com/blog/2022-12-01-listening-2022/)</span>, and he even made an <span class="co">[</span><span class="ot">accompanying package {wrapped}</span><span class="co">](https://github.com/simonpcouch/wrapped)</span> for doing it yourself. His package is designed to extract the play counts of all the music *added* in a given year, while I want the counts for all years, so I modified his <span class="in">`wrap_library()`</span> function slightly to ignore the year argument and just parse everything. The modified function, now <span class="in">`read_itunes_library()`</span> is below, for the morbidly curious:</span>
+<span id="cb14-132"><a href="#cb14-132" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-135"><a href="#cb14-135" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb14-136"><a href="#cb14-136" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb14-137"><a href="#cb14-137" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: true</span></span>
+<span id="cb14-138"><a href="#cb14-138" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-summary: "**R code for `read_itunes_library()`**"</span></span>
+<span id="cb14-139"><a href="#cb14-139" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-140"><a href="#cb14-140" aria-hidden="true" tabindex="-1"></a><span class="co"># Copied with tiiiiny modifications from Simon Couch's {wrapped}:</span></span>
+<span id="cb14-141"><a href="#cb14-141" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb14-142"><a href="#cb14-142" aria-hidden="true" tabindex="-1"></a><span class="co"># - https://www.simonpcouch.com/blog/2022-12-01-listening-2022/</span></span>
+<span id="cb14-143"><a href="#cb14-143" aria-hidden="true" tabindex="-1"></a><span class="co"># - https://github.com/simonpcouch/wrapped/blob/main/R/wrap_library.R</span></span>
+<span id="cb14-144"><a href="#cb14-144" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-145"><a href="#cb14-145" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb14-146"><a href="#cb14-146" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-147"><a href="#cb14-147" aria-hidden="true" tabindex="-1"></a>read_itunes_library <span class="ot">&lt;-</span> <span class="cf">function</span>(path, <span class="at">year =</span> <span class="dv">2022</span>L) {</span>
+<span id="cb14-148"><a href="#cb14-148" aria-hidden="true" tabindex="-1"></a>  raw <span class="ot">&lt;-</span> xml2<span class="sc">::</span><span class="fu">read_xml</span>(path)</span>
+<span id="cb14-149"><a href="#cb14-149" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb14-150"><a href="#cb14-150" aria-hidden="true" tabindex="-1"></a>  res <span class="ot">&lt;-</span> xml2<span class="sc">::</span><span class="fu">as_list</span>(raw)</span>
+<span id="cb14-151"><a href="#cb14-151" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb14-152"><a href="#cb14-152" aria-hidden="true" tabindex="-1"></a>  res <span class="ot">&lt;-</span> purrr<span class="sc">::</span><span class="fu">pluck</span>(res, <span class="st">"plist"</span>, <span class="st">"dict"</span>, <span class="st">"dict"</span>)</span>
+<span id="cb14-153"><a href="#cb14-153" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb14-154"><a href="#cb14-154" aria-hidden="true" tabindex="-1"></a>  res <span class="ot">&lt;-</span> res[<span class="fu">names</span>(res) <span class="sc">!=</span> <span class="st">"key"</span>]</span>
+<span id="cb14-155"><a href="#cb14-155" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb14-156"><a href="#cb14-156" aria-hidden="true" tabindex="-1"></a>  res <span class="ot">&lt;-</span> </span>
+<span id="cb14-157"><a href="#cb14-157" aria-hidden="true" tabindex="-1"></a>    tibble<span class="sc">::</span><span class="fu">enframe</span>(res) <span class="sc">%&gt;%</span></span>
+<span id="cb14-158"><a href="#cb14-158" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">rowwise</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb14-159"><a href="#cb14-159" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">value =</span> <span class="fu">list</span>(tibble<span class="sc">::</span><span class="fu">enframe</span>(value))) <span class="sc">%&gt;%</span></span>
+<span id="cb14-160"><a href="#cb14-160" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb14-161"><a href="#cb14-161" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">id =</span> dplyr<span class="sc">::</span><span class="fu">row_number</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb14-162"><a href="#cb14-162" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span>name) <span class="sc">%&gt;%</span></span>
+<span id="cb14-163"><a href="#cb14-163" aria-hidden="true" tabindex="-1"></a>    tidyr<span class="sc">::</span><span class="fu">unnest</span>(value) <span class="sc">%&gt;%</span></span>
+<span id="cb14-164"><a href="#cb14-164" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">mutate</span>(</span>
+<span id="cb14-165"><a href="#cb14-165" aria-hidden="true" tabindex="-1"></a>      <span class="at">entry_id =</span> (dplyr<span class="sc">::</span><span class="fu">row_number</span>() <span class="sc">+</span> (dplyr<span class="sc">::</span><span class="fu">row_number</span>() <span class="sc">%%</span> <span class="dv">2</span>)) <span class="sc">/</span> <span class="dv">2</span></span>
+<span id="cb14-166"><a href="#cb14-166" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb14-167"><a href="#cb14-167" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">rowwise</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb14-168"><a href="#cb14-168" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">value =</span> dplyr<span class="sc">::</span><span class="fu">if_else</span>(<span class="fu">length</span>(value) <span class="sc">==</span> <span class="dv">0</span>L, <span class="fu">list</span>(<span class="fu">list</span>(<span class="cn">NA</span>)), <span class="fu">list</span>(value)),</span>
+<span id="cb14-169"><a href="#cb14-169" aria-hidden="true" tabindex="-1"></a>           <span class="at">value =</span> <span class="fu">unlist</span>(value)) <span class="sc">%&gt;%</span></span>
+<span id="cb14-170"><a href="#cb14-170" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb14-171"><a href="#cb14-171" aria-hidden="true" tabindex="-1"></a>    tidyr<span class="sc">::</span><span class="fu">pivot_wider</span>(<span class="at">id_cols =</span> <span class="fu">c</span>(id, entry_id), <span class="at">names_from =</span> name, <span class="at">values_from =</span> value, <span class="at">values_fn =</span> list) <span class="sc">%&gt;%</span></span>
+<span id="cb14-172"><a href="#cb14-172" aria-hidden="true" tabindex="-1"></a>    tidyr<span class="sc">::</span><span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="dv">4</span><span class="sc">:</span><span class="fu">ncol</span>(.), <span class="at">names_to =</span> <span class="st">"type"</span>, <span class="at">values_drop_na =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb14-173"><a href="#cb14-173" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span>type) <span class="sc">%&gt;%</span></span>
+<span id="cb14-174"><a href="#cb14-174" aria-hidden="true" tabindex="-1"></a>    tidyr<span class="sc">::</span><span class="fu">pivot_wider</span>(<span class="at">id_cols =</span> id, <span class="at">names_from =</span> key, <span class="at">values_from =</span> value) <span class="sc">%&gt;%</span></span>
+<span id="cb14-175"><a href="#cb14-175" aria-hidden="true" tabindex="-1"></a>    janitor<span class="sc">::</span><span class="fu">clean_names</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb14-176"><a href="#cb14-176" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">select</span>(id, <span class="at">track_title =</span> name, artist, album_artist, album, genre, total_time, date_added, skip_count, play_count) <span class="sc">%&gt;%</span></span>
+<span id="cb14-177"><a href="#cb14-177" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">rowwise</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb14-178"><a href="#cb14-178" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">mutate</span>(dplyr<span class="sc">::</span><span class="fu">across</span>(<span class="fu">everything</span>(), <span class="sc">~</span>dplyr<span class="sc">::</span><span class="fu">if_else</span>(<span class="fu">is.null</span>(.x), <span class="fu">list</span>(<span class="cn">NA</span>), <span class="fu">list</span>(.x)))) <span class="sc">%&gt;%</span></span>
+<span id="cb14-179"><a href="#cb14-179" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">mutate</span>(dplyr<span class="sc">::</span><span class="fu">across</span>(<span class="fu">everything</span>(), unlist)) <span class="sc">%&gt;%</span></span>
+<span id="cb14-180"><a href="#cb14-180" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">mutate</span>(</span>
+<span id="cb14-181"><a href="#cb14-181" aria-hidden="true" tabindex="-1"></a>      <span class="at">date_added =</span> <span class="fu">strsplit</span>(date_added, <span class="st">"T"</span>),</span>
+<span id="cb14-182"><a href="#cb14-182" aria-hidden="true" tabindex="-1"></a>      <span class="at">date_added =</span> date_added[<span class="dv">1</span>],</span>
+<span id="cb14-183"><a href="#cb14-183" aria-hidden="true" tabindex="-1"></a>      <span class="at">date_added =</span> lubridate<span class="sc">::</span><span class="fu">ymd</span>(date_added),</span>
+<span id="cb14-184"><a href="#cb14-184" aria-hidden="true" tabindex="-1"></a>      <span class="at">skip_count =</span> <span class="fu">as.numeric</span>(skip_count),</span>
+<span id="cb14-185"><a href="#cb14-185" aria-hidden="true" tabindex="-1"></a>      <span class="at">play_count =</span> <span class="fu">as.numeric</span>(play_count),</span>
+<span id="cb14-186"><a href="#cb14-186" aria-hidden="true" tabindex="-1"></a>      <span class="at">total_time =</span> <span class="fu">as.numeric</span>(total_time)</span>
+<span id="cb14-187"><a href="#cb14-187" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb14-188"><a href="#cb14-188" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb14-189"><a href="#cb14-189" aria-hidden="true" tabindex="-1"></a>    <span class="co"># dplyr::filter(lubridate::year(date_added) %in% year) %&gt;%</span></span>
+<span id="cb14-190"><a href="#cb14-190" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">arrange</span>(dplyr<span class="sc">::</span><span class="fu">desc</span>(play_count))</span>
+<span id="cb14-191"><a href="#cb14-191" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-192"><a href="#cb14-192" aria-hidden="true" tabindex="-1"></a>  res</span>
+<span id="cb14-193"><a href="#cb14-193" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb14-194"><a href="#cb14-194" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-195"><a href="#cb14-195" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-196"><a href="#cb14-196" aria-hidden="true" tabindex="-1"></a><span class="in">```r</span></span>
+<span id="cb14-197"><a href="#cb14-197" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb14-198"><a href="#cb14-198" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-199"><a href="#cb14-199" aria-hidden="true" tabindex="-1"></a><span class="co"># Copy this function from the text earlier </span></span>
+<span id="cb14-200"><a href="#cb14-200" aria-hidden="true" tabindex="-1"></a>read_itunes_library <span class="ot">&lt;-</span> <span class="cf">function</span>(...) {...}</span>
+<span id="cb14-201"><a href="#cb14-201" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-202"><a href="#cb14-202" aria-hidden="true" tabindex="-1"></a>music_january <span class="ot">&lt;-</span> <span class="fu">read_itunes_library</span>(<span class="st">"Library_2024-01-01.xml"</span>)</span>
+<span id="cb14-203"><a href="#cb14-203" aria-hidden="true" tabindex="-1"></a>music_december <span class="ot">&lt;-</span> <span class="fu">read_itunes_library</span>(<span class="st">"Library_2024-12-04.xml"</span>)</span>
+<span id="cb14-204"><a href="#cb14-204" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-205"><a href="#cb14-205" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-208"><a href="#cb14-208" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb14-209"><a href="#cb14-209" aria-hidden="true" tabindex="-1"></a><span class="co">#| include: false</span></span>
+<span id="cb14-210"><a href="#cb14-210" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb14-211"><a href="#cb14-211" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tinytable)</span>
+<span id="cb14-212"><a href="#cb14-212" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-213"><a href="#cb14-213" aria-hidden="true" tabindex="-1"></a>music_january <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">"data-processed/music_start.rds"</span>)</span>
+<span id="cb14-214"><a href="#cb14-214" aria-hidden="true" tabindex="-1"></a>music_december <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">"data-processed/music_end.rds"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb14-215"><a href="#cb14-215" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(date_added))</span>
+<span id="cb14-216"><a href="#cb14-216" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-217"><a href="#cb14-217" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-218"><a href="#cb14-218" aria-hidden="true" tabindex="-1"></a>Here's what that data looks like:<span class="ot">[^minecraft]</span></span>
+<span id="cb14-219"><a href="#cb14-219" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-220"><a href="#cb14-220" aria-hidden="true" tabindex="-1"></a><span class="ot">[^minecraft]: </span>My most recent Bandcamp purchases were the two Minecraft soundtracks (<span class="co">[</span><span class="ot">Volume Alpha</span><span class="co">](https://c418.bandcamp.com/album/minecraft-volume-alpha)</span> and <span class="co">[</span><span class="ot">Volume Beta</span><span class="co">](https://c418.bandcamp.com/album/minecraft-volume-beta)</span>) for my Minecraft-obsessed kids, hence those tracks in the <span class="in">`glimpse()`</span> output there.</span>
+<span id="cb14-221"><a href="#cb14-221" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-224"><a href="#cb14-224" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb14-225"><a href="#cb14-225" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(music_december)</span>
+<span id="cb14-226"><a href="#cb14-226" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-227"><a href="#cb14-227" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-228"><a href="#cb14-228" aria-hidden="true" tabindex="-1"></a>There are columns for iTunes/Music's internal track ID, a bunch of track metadata like title, artist, album, genre, and date added, and columns for the skip count and play count. Those are all columns Simon decided to include with his {wrapper} package—if you modify the <span class="in">`read_itunes_library()`</span> function from earlier, you can keep any of the metadata that Music keeps track of.</span>
+<span id="cb14-229"><a href="#cb14-229" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-230"><a href="#cb14-230" aria-hidden="true" tabindex="-1"></a>With library data from both January and December loaded, I next combine them into one dataset with the total number of plays in 2024. This requires a tiny bit of data wrangling: I rename the play count column in the December data, join the January data to it, rename the January play count column, recode missing play counts as 0, and find the difference between play counts in December and January:</span>
+<span id="cb14-231"><a href="#cb14-231" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-234"><a href="#cb14-234" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb14-235"><a href="#cb14-235" aria-hidden="true" tabindex="-1"></a>music_2024 <span class="ot">&lt;-</span> music_december <span class="sc">|&gt;</span> </span>
+<span id="cb14-236"><a href="#cb14-236" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Rename the column of December play counts</span></span>
+<span id="cb14-237"><a href="#cb14-237" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">play_count_end =</span> play_count) <span class="sc">|&gt;</span></span>
+<span id="cb14-238"><a href="#cb14-238" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Merge in the play count column from the January 1 data</span></span>
+<span id="cb14-239"><a href="#cb14-239" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(</span>
+<span id="cb14-240"><a href="#cb14-240" aria-hidden="true" tabindex="-1"></a>    music_january <span class="sc">|&gt;</span> <span class="fu">select</span>(id, <span class="at">play_count_start =</span> play_count),</span>
+<span id="cb14-241"><a href="#cb14-241" aria-hidden="true" tabindex="-1"></a>    <span class="at">by =</span> <span class="fu">join_by</span>(id)</span>
+<span id="cb14-242"><a href="#cb14-242" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
+<span id="cb14-243"><a href="#cb14-243" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Tracks that were added in 2024 don't show up in music_january, so they appear </span></span>
+<span id="cb14-244"><a href="#cb14-244" aria-hidden="true" tabindex="-1"></a>  <span class="co"># in the merged data as NA. This recodes them as 0, which makes it so I can </span></span>
+<span id="cb14-245"><a href="#cb14-245" aria-hidden="true" tabindex="-1"></a>  <span class="co"># do math with them in the next step</span></span>
+<span id="cb14-246"><a href="#cb14-246" aria-hidden="true" tabindex="-1"></a>  <span class="fu">replace_na</span>(<span class="fu">list</span>(<span class="at">play_count_start =</span> <span class="dv">0</span>, <span class="at">play_count_end =</span> <span class="dv">0</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb14-247"><a href="#cb14-247" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Calculate the difference between December and January play counts</span></span>
+<span id="cb14-248"><a href="#cb14-248" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">play_count_2024 =</span> play_count_end <span class="sc">-</span> play_count_start)</span>
+<span id="cb14-249"><a href="#cb14-249" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-250"><a href="#cb14-250" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-251"><a href="#cb14-251" aria-hidden="true" tabindex="-1"></a>Let's see what the merged data looks like really quick:</span>
+<span id="cb14-252"><a href="#cb14-252" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-255"><a href="#cb14-255" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb14-256"><a href="#cb14-256" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(music_2024)</span>
+<span id="cb14-257"><a href="#cb14-257" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-258"><a href="#cb14-258" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-259"><a href="#cb14-259" aria-hidden="true" tabindex="-1"></a>That new <span class="in">`play_count_2024`</span> column is the main thing I'm interested in—I can summarize it a bunch of different ways.</span>
+<span id="cb14-260"><a href="#cb14-260" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-261"><a href="#cb14-261" aria-hidden="true" tabindex="-1"></a><span class="fu"># Minutes listened</span></span>
+<span id="cb14-262"><a href="#cb14-262" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-263"><a href="#cb14-263" aria-hidden="true" tabindex="-1"></a>There's a column for <span class="in">`total_time`</span> that's measured in milliseconds. I can multiply it by the play count and do some division to figure out a rough count of the total number of minutes listened. It's not 100% accurate since it doesn't account for partial listens, but it's close enough.</span>
+<span id="cb14-264"><a href="#cb14-264" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-267"><a href="#cb14-267" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb14-268"><a href="#cb14-268" aria-hidden="true" tabindex="-1"></a>music_2024 <span class="sc">|&gt;</span> </span>
+<span id="cb14-269"><a href="#cb14-269" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">time_plays =</span> total_time <span class="sc">*</span> play_count_2024) <span class="sc">|&gt;</span> </span>
+<span id="cb14-270"><a href="#cb14-270" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">total_ms =</span> <span class="fu">sum</span>(time_plays)) <span class="sc">|&gt;</span> </span>
+<span id="cb14-271"><a href="#cb14-271" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">total_minutes =</span> total_ms <span class="sc">/</span> <span class="dv">1000</span> <span class="sc">/</span> <span class="dv">60</span>)</span>
+<span id="cb14-272"><a href="#cb14-272" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-273"><a href="#cb14-273" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-274"><a href="#cb14-274" aria-hidden="true" tabindex="-1"></a><span class="fu"># New music</span></span>
+<span id="cb14-275"><a href="#cb14-275" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-276"><a href="#cb14-276" aria-hidden="true" tabindex="-1"></a>Here's all the new music I added in 2024:</span>
+<span id="cb14-277"><a href="#cb14-277" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-280"><a href="#cb14-280" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb14-281"><a href="#cb14-281" aria-hidden="true" tabindex="-1"></a>added_2024 <span class="ot">&lt;-</span> music_2024 <span class="sc">|&gt;</span> </span>
+<span id="cb14-282"><a href="#cb14-282" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">year_added =</span> <span class="fu">year</span>(date_added)) <span class="sc">|&gt;</span> </span>
+<span id="cb14-283"><a href="#cb14-283" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(year_added <span class="sc">==</span> <span class="dv">2024</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb14-284"><a href="#cb14-284" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(album_artist, album, date_added)</span>
+<span id="cb14-285"><a href="#cb14-285" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-286"><a href="#cb14-286" aria-hidden="true" tabindex="-1"></a>added_2024 <span class="sc">|&gt;</span> </span>
+<span id="cb14-287"><a href="#cb14-287" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(date_added) <span class="sc">|&gt;</span> </span>
+<span id="cb14-288"><a href="#cb14-288" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="at">n =</span> <span class="cn">Inf</span>)</span>
+<span id="cb14-289"><a href="#cb14-289" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-290"><a href="#cb14-290" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-291"><a href="#cb14-291" aria-hidden="true" tabindex="-1"></a><span class="fu"># Top songs</span></span>
+<span id="cb14-292"><a href="#cb14-292" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-293"><a href="#cb14-293" aria-hidden="true" tabindex="-1"></a>And here are the top songs:</span>
+<span id="cb14-294"><a href="#cb14-294" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-297"><a href="#cb14-297" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb14-298"><a href="#cb14-298" aria-hidden="true" tabindex="-1"></a>top_played <span class="ot">&lt;-</span> music_2024 <span class="sc">|&gt;</span> </span>
+<span id="cb14-299"><a href="#cb14-299" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(track_title, artist, play_count_2024) <span class="sc">|&gt;</span> </span>
+<span id="cb14-300"><a href="#cb14-300" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(play_count_2024))</span>
+<span id="cb14-301"><a href="#cb14-301" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-302"><a href="#cb14-302" aria-hidden="true" tabindex="-1"></a>top_played</span>
+<span id="cb14-303"><a href="#cb14-303" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-304"><a href="#cb14-304" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-305"><a href="#cb14-305" aria-hidden="true" tabindex="-1"></a><span class="fu"># Top artists</span></span>
+<span id="cb14-306"><a href="#cb14-306" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-307"><a href="#cb14-307" aria-hidden="true" tabindex="-1"></a>And the top artists:</span>
+<span id="cb14-308"><a href="#cb14-308" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-311"><a href="#cb14-311" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb14-312"><a href="#cb14-312" aria-hidden="true" tabindex="-1"></a>top_artists <span class="ot">&lt;-</span> music_2024 <span class="sc">|&gt;</span> </span>
+<span id="cb14-313"><a href="#cb14-313" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(artist) <span class="sc">|&gt;</span> </span>
+<span id="cb14-314"><a href="#cb14-314" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">play_count =</span> <span class="fu">sum</span>(play_count_2024)) <span class="sc">|&gt;</span> </span>
+<span id="cb14-315"><a href="#cb14-315" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(play_count))</span>
+<span id="cb14-316"><a href="#cb14-316" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-317"><a href="#cb14-317" aria-hidden="true" tabindex="-1"></a>top_artists</span>
+<span id="cb14-318"><a href="#cb14-318" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-319"><a href="#cb14-319" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-320"><a href="#cb14-320" aria-hidden="true" tabindex="-1"></a><span class="fu"># Top albums</span></span>
+<span id="cb14-321"><a href="#cb14-321" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-322"><a href="#cb14-322" aria-hidden="true" tabindex="-1"></a>And the top albums. This is a little trickier since Music doesn't keep track of full album listens (and I don't think Spotify does that either), so it's a count of the number of tracks played in the album. That means the count is biased towards longer albums like *1989* (21 tracks) or the *Rings of Power* soundtrack (40 tracks). But it's still a helpful overview:</span>
+<span id="cb14-323"><a href="#cb14-323" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-326"><a href="#cb14-326" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb14-327"><a href="#cb14-327" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: false</span></span>
+<span id="cb14-328"><a href="#cb14-328" aria-hidden="true" tabindex="-1"></a>top_albums <span class="ot">&lt;-</span> music_2024 <span class="sc">|&gt;</span> </span>
+<span id="cb14-329"><a href="#cb14-329" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(album, artist) <span class="sc">|&gt;</span> </span>
+<span id="cb14-330"><a href="#cb14-330" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">count_of_tracks_played_in_album =</span> <span class="fu">sum</span>(play_count_2024)) <span class="sc">|&gt;</span> </span>
+<span id="cb14-331"><a href="#cb14-331" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(count_of_tracks_played_in_album))</span>
+<span id="cb14-332"><a href="#cb14-332" aria-hidden="true" tabindex="-1"></a>top_albums</span>
+<span id="cb14-333"><a href="#cb14-333" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-334"><a href="#cb14-334" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-335"><a href="#cb14-335" aria-hidden="true" tabindex="-1"></a><span class="fu"># Final images</span></span>
+<span id="cb14-336"><a href="#cb14-336" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-337"><a href="#cb14-337" aria-hidden="true" tabindex="-1"></a>This is all ugly console output, so finally, I whipped up a couple Wrapped-esque images in Illustrator with the statistics;</span>
+<span id="cb14-338"><a href="#cb14-338" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-339"><a href="#cb14-339" aria-hidden="true" tabindex="-1"></a><span class="al">![Top artists and total mintues](img/apple-music-wrapped-summary.png)</span>{width="80%" fig-align="center"}</span>
+<span id="cb14-340"><a href="#cb14-340" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-341"><a href="#cb14-341" aria-hidden="true" tabindex="-1"></a><span class="al">![Top songs](img/apple-music-wrapped-top-songs.png)</span>{width="80%" fig-align="center"}</span>
+</code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+<footer class="footer"><div class="nav-footer">
+    <div class="nav-footer-left">
+<p><span class="faux-block"><i class="fa-brands fa-creative-commons" aria-label="creative-commons"></i> 2007–2024 Andrew Heiss</span> <span class="faux-block">All content licensed under<br><a href="https://creativecommons.org/licenses/by/4.0/"><i class="fa-brands fa-creative-commons" aria-label="creative-commons"></i> <i class="fa-brands fa-creative-commons-by" aria-label="creative-commons-by"></i> Creative Commons CC BY 4.0</a></span></p>
+</div>   
+    <div class="nav-footer-center">
+<p><span class="faux-block"><i class="fa-brands fa-orcid" aria-label="orcid"></i> <strong>ORCID</strong> <a href="https://orcid.org/0000-0002-3948-3914">0000-0002-3948-3914</a></span> <span class="faux-block"><i class="fa-solid fa-key" aria-label="key"></i> <a href="../../../../../pgp_ath.asc.txt">PGP public key</a>   <i class="fa-solid fa-fingerprint" aria-label="fingerprint"></i> Fingerprint:<br><span class="fingerprint">4AA2 FA83 A8B2 05A4 E30F<br> 610D 1382 6216 9178 36AB</span></span></p>
+</div>
+    <div class="nav-footer-right">
+<p><span class="faux-block">Made with <i class="fa-brands fa-r-project" aria-label="r-project"></i> and <a href="https://quarto.org/">Quarto</a></span> <span class="faux-block"><a href="https://github.com/andrewheiss/ath-quarto">View the source at <i class="fa-brands fa-github" aria-label="github"></i> GitHub</a></span></p>
+</div>
+  </div>
+</footer>
+
+
+</body></html>

@@ -1,0 +1,1793 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.42">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<meta name="author" content="Andrew Heiss">
+<meta name="description" content="Visually explore how {dplyr}’s more complex core functions work together to wrangle data">
+<title>Visualizing {dplyr}’s mutate(), summarize(), group_by(), and ungroup() with animations | Andrew Heiss – Andrew Heiss</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+<script src="../../../../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../../../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../../../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../../../../">
+<link href="../../../../..//files/favicon-512.png" rel="icon" type="image/png">
+<script src="../../../../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../../../site_libs/quarto-html/quarto-syntax-highlighting-17c909d5fd25ae21b861c0c7a49b2096.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../../../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../../../../site_libs/bootstrap/bootstrap-5cd0811f461c8271ae6bab49df9501be.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../../../../site_libs/quarto-contrib/fontawesome6-0.1.0/all.css" rel="stylesheet">
+<link href="../../../../../site_libs/quarto-contrib/fontawesome6-0.1.0/latex-fontsize.css" rel="stylesheet">
+<script src="../../../../../site_libs/quarto-contrib/iconify-2.0.0/iconify-icon.min.js"></script><script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script><script type="text/javascript">
+
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-527449-5', 'auto');
+
+ga('send', {
+  hitType: 'pageview',
+  'anonymizeIp': true,
+});
+</script><style>
+
+      .quarto-title-block .quarto-title-banner {
+        background: #170C3A;
+      }
+</style>
+<meta property="og:title" content="Visualizing {dplyr}’s mutate(), summarize(), group_by(), and ungroup() with animations | Andrew Heiss">
+<meta property="og:description" content="Visually explore how {dplyr}’s more complex core functions work together to wrangle data">
+<meta property="og:image" content="https://www.andrewheiss.com/blog/2024/04/04/group_by-summarize-ungroup-animations/downloads/PNG/grp-summarize-02@4x.png">
+<meta property="og:site_name" content="Andrew Heiss">
+<meta property="og:locale" content="en_US">
+<meta property="og:image:height" content="4320">
+<meta property="og:image:width" content="7680">
+<meta name="twitter:title" content="Visualizing {dplyr}’s mutate(), summarize(), group_by(), and ungroup() with animations | Andrew Heiss">
+<meta name="twitter:description" content="Visually explore how {dplyr}’s more complex core functions work together to wrangle data">
+<meta name="twitter:image" content="https://www.andrewheiss.com/blog/2024/04/04/group_by-summarize-ungroup-animations/downloads/PNG/grp-summarize-02@4x.png">
+<meta name="twitter:creator" content="@andrewheiss">
+<meta name="twitter:site" content="@andrewheiss">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image-height" content="4320">
+<meta name="twitter:image-width" content="7680">
+</head>
+<body class="floating nav-fixed slimcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner"><nav class="navbar navbar-expand-lg " data-bs-theme="dark"><div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../../../../index.html">
+    <span class="navbar-title">Andrew Heiss</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+<li class="nav-item">
+    <a class="nav-link" href="../../../../../index.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../../../cv/index.html"> 
+<span class="menu-text">CV</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../../../blog/index.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../../../research/index.html"> 
+<span class="menu-text">Research</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../../../teaching/index.html"> 
+<span class="menu-text">Teaching</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../../../talks/index.html"> 
+<span class="menu-text">Talks</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../../../now/index.html"> 
+<span class="menu-text">Now</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../../../uses/index.html"> 
+<span class="menu-text">Uses</span></a>
+  </li>  
+</ul>
+<ul class="navbar-nav navbar-nav-scroll ms-auto">
+<li class="nav-item">
+    <a class="nav-link" href="../../../../../atom.xml"> 
+<span class="menu-text"><iconify-icon inline="" icon="bi:rss" style="font-size: 1.1em;" aria-label="Icon rss from bi Iconify.design set." title="RSS"></iconify-icon></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="mailto:aheiss@gsu.edu"> 
+<span class="menu-text"><iconify-icon inline="" icon="bi:envelope" style="font-size: 1.1em;" aria-label="Icon envelope from bi Iconify.design set." title="E-mail"></iconify-icon></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://bsky.app/profile/andrew.heiss.phd" rel="me"> 
+<span class="menu-text"><iconify-icon inline="" icon="fa6-brands:bluesky" style="font-size: 1.1em;" aria-label="Icon bluesky from fa6-brands Iconify.design set." title="Bluesky"></iconify-icon></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://fediscience.org/users/andrew/" rel="me"> 
+<span class="menu-text"><iconify-icon inline="" icon="bi:mastodon" style="font-size: 1.1em;" aria-label="Icon mastodon from bi Iconify.design set." title="Mastodon"></iconify-icon></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://github.com/andrewheiss" rel="me"> 
+<span class="menu-text"><iconify-icon inline="" icon="bi:github" style="font-size: 1.1em;" aria-label="Icon github from bi Iconify.design set." title="GitHub"></iconify-icon></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://www.youtube.com/andrewheiss" rel="me"> 
+<span class="menu-text"><iconify-icon inline="" icon="bi:youtube" style="font-size: 1.1em;" aria-label="Icon youtube from bi Iconify.design set." title="YouTube"></iconify-icon></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://www.heissatopia.com/"> 
+<span class="menu-text"><iconify-icon inline="" icon="fa6-brands:blogger" style="font-size: 1.15em;" aria-label="Icon blogger from fa6-brands Iconify.design set." title="Blogger"></iconify-icon></span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="https://www.linkedin.com/in/andrewheiss" rel="me"> 
+<span class="menu-text"><iconify-icon inline="" icon="bi:linkedin" style="font-size: 1.1em;" aria-label="Icon linkedin from bi Iconify.design set." title="LinkedIn"></iconify-icon></span></a>
+  </li>  
+</ul>
+</div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav></header><!-- content --><header id="title-block-header" class="quarto-title-block default blog-post page-columns page-full"><div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <div class="quarto-title-block"><div><h1 class="title">Visualizing {dplyr}’s mutate(), summarize(), group_by(), and ungroup() with animations</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+                  <div>
+        <div class="description">
+          Visually explore how {dplyr}’s more complex core functions work together to wrangle data
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">r</div>
+                <div class="quarto-category">tidyverse</div>
+                <div class="quarto-category">dplyr</div>
+                <div class="quarto-category">animations</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p><a href="https://www.andrewheiss.com/">Andrew Heiss</a> <a href="https://orcid.org/0000-0002-3948-3914" class="quarto-title-author-orcid"> <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2ZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo1N0NEMjA4MDI1MjA2ODExOTk0QzkzNTEzRjZEQTg1NyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDozM0NDOEJGNEZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDozM0NDOEJGM0ZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M1IE1hY2ludG9zaCI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkZDN0YxMTc0MDcyMDY4MTE5NUZFRDc5MUM2MUUwNEREIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjU3Q0QyMDgwMjUyMDY4MTE5OTRDOTM1MTNGNkRBODU3Ii8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+84NovQAAAR1JREFUeNpiZEADy85ZJgCpeCB2QJM6AMQLo4yOL0AWZETSqACk1gOxAQN+cAGIA4EGPQBxmJA0nwdpjjQ8xqArmczw5tMHXAaALDgP1QMxAGqzAAPxQACqh4ER6uf5MBlkm0X4EGayMfMw/Pr7Bd2gRBZogMFBrv01hisv5jLsv9nLAPIOMnjy8RDDyYctyAbFM2EJbRQw+aAWw/LzVgx7b+cwCHKqMhjJFCBLOzAR6+lXX84xnHjYyqAo5IUizkRCwIENQQckGSDGY4TVgAPEaraQr2a4/24bSuoExcJCfAEJihXkWDj3ZAKy9EJGaEo8T0QSxkjSwORsCAuDQCD+QILmD1A9kECEZgxDaEZhICIzGcIyEyOl2RkgwAAhkmC+eAm0TAAAAABJRU5ErkJggg=="></a></p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">Thursday, April 4, 2024</p>
+      </div>
+    </div>
+    
+      
+      <div>
+      <div class="quarto-title-meta-heading">Doi</div>
+      <div class="quarto-title-meta-contents">
+        <p class="doi">
+          <a href="https://doi.org/10.59350/d2sz4-w4e25">10.59350/d2sz4-w4e25</a>
+        </p>
+      </div>
+    </div>
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto"><nav id="TOC" role="doc-toc" class="toc-active"><h2 id="toc-title">Contents</h2>
+   
+  <ul>
+<li><a href="#adding-new-columns-with-mutate" id="toc-adding-new-columns-with-mutate" class="nav-link active" data-scroll-target="#adding-new-columns-with-mutate">Adding new columns with <code>mutate()</code></a></li>
+  <li><a href="#summarizing-with-summarize" id="toc-summarizing-with-summarize" class="nav-link" data-scroll-target="#summarizing-with-summarize">Summarizing with <code>summarize()</code></a></li>
+  <li><a href="#grouping-and-ungrouping-with-group_by-and-ungroup" id="toc-grouping-and-ungrouping-with-group_by-and-ungroup" class="nav-link" data-scroll-target="#grouping-and-ungrouping-with-group_by-and-ungroup">Grouping and ungrouping with <code>group_by()</code> and <code>ungroup()</code></a></li>
+  <li><a href="#mutating-within-groups" id="toc-mutating-within-groups" class="nav-link" data-scroll-target="#mutating-within-groups">Mutating within groups</a></li>
+  <li><a href="#summarizing-groups-with-group_by-summarize" id="toc-summarizing-groups-with-group_by-summarize" class="nav-link" data-scroll-target="#summarizing-groups-with-group_by-summarize">Summarizing groups with <code>group_by() |&gt; summarize()</code></a></li>
+  <li><a href="#summarizing-multiple-groups" id="toc-summarizing-multiple-groups" class="nav-link" data-scroll-target="#summarizing-multiple-groups">Summarizing multiple groups</a></li>
+  <li><a href="#leftover-groupings-and-ungroup" id="toc-leftover-groupings-and-ungroup" class="nav-link" data-scroll-target="#leftover-groupings-and-ungroup">Leftover groupings and <code>ungroup()</code></a></li>
+  <li><a href="#why-care-about-leftover-groups" id="toc-why-care-about-leftover-groups" class="nav-link" data-scroll-target="#why-care-about-leftover-groups">Why care about leftover groups?</a></li>
+  </ul></nav>
+</nav><div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block page-columns page-full" id="quarto-document-content"><p>I’ve used Garrick Aden-Buie’s <a href="https://www.garrickadenbuie.com/project/tidyexplain/">tidyexplain</a> animations since he first made them in 2018. They’re incredibly useful for teaching—being able to see which rows <a href="https://www.garrickadenbuie.com/project/tidyexplain/#left-join"><code>left_join()</code></a> includes when merging two datasets, or <a href="https://www.garrickadenbuie.com/project/tidyexplain/#pivot-wider-and-longer">which cells end up where when pivoting longer or pivoting wider</a> is so valuable. <a href="https://www.garrickadenbuie.com/project/tidyexplain/">Check them all out</a>—they’re so fantastic:</p>
+<div class="quarto-figure quarto-figure-center page-columns page-full">
+<figure class="figure page-columns page-full"><p><img src="img/left-join.gif" class="center img-fluid figure-img"></p>
+<figcaption class="margin-caption"><code>left_join()</code> animation by Garrick Aden-Buie</figcaption></figure>
+</div>
+<p>One set of animations that I’ve always wished existed but doesn’t is how {dplyr}’s <code>mutate()</code>, <code>summarize()</code>, <code>group_by()</code>, and <code>summarize()</code> work. Unlike other more straightforward {dplyr} functions like <code><a href="https://rdrr.io/r/stats/filter.html">filter()</a></code> and <code>select()</code>, these mutating/summarizing/grouping functions often involve multiple behind-the-scenes steps that are hard to see. There’s even an official term for this kind of workflow: <a href="https://vita.had.co.nz/papers/plyr.pdf">split/apply/combine</a>.</p>
+<p>When I teach about <code>group_by() |&gt; summarize()</code>, I end up waving my arms around a lot to explain how <code>group_by()</code> puts rows into smaller, invisible datasets behind the scenes. This works, I guess, but I still find that it can be hard for people to conceptualize. It gets even trickier when explaining how {dplyr} keeps some grouping structures intact after summarizing and what exactly <code>ungroup()</code> does.</p>
+<p>So, I finally buckled down and made my own tidyexplain-esque animations with Adobe Illustrator and After Effects.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
+<div class="no-row-height column-margin column-container"><div id="fn1"><p><sup>1</sup>&nbsp;I tried doing it with R and {gganimate} <a href="https://github.com/gadenbuie/tidyexplain">like the original tidyexplain animations</a>, but it was too hard to do with all the multiple grouping, summarizing, and recombining steps—so these are all artisanally handcrafted animations.</p></div></div><div id="downloads" class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Downloads
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>You can download versions of all seven animations here:</p>
+<ul>
+<li>
+<code>mutate()</code>: <a href="downloads/Video/grp-mutate.mp4">MP4</a>, <a href="downloads/GIF/grp-mutate.gif">GIF</a>, <a href="downloads/PDF/grp-mutate.pdf">static PDF</a>, <a href="downloads/SVG/grp-mutate.svg">static SVG</a>, <a href="downloads/PNG/grp-mutate@4x.png">static PNG</a>
+</li>
+<li>
+<code>summarize()</code>: <a href="downloads/Video/grp-summarize-00.mp4">MP4</a>, <a href="downloads/GIF/grp-summarize-00.gif">GIF</a>, <a href="downloads/PDF/grp-summarize-00.pdf">static PDF</a>, <a href="downloads/SVG/grp-summarize-00.svg">static SVG</a>, <a href="downloads/PNG/grp-summarize-00@4x.png">static PNG</a>
+</li>
+<li>
+<code>group_by() |&gt; ungroup()</code>: <a href="downloads/Video/grp-ungroup.mp4">MP4</a>, <a href="downloads/GIF/grp-ungroup.gif">GIF</a>, <a href="downloads/PDF/grp-ungroup.pdf">static PDF</a>, <a href="downloads/SVG/grp-ungroup.svg">static SVG</a>, <a href="downloads/PNG/grp-ungroup@4x.png">static PNG</a>
+</li>
+<li>
+<code>group_by() |&gt; mutate()</code>: <a href="downloads/Video/grp-mutate.mp4">MP4</a>, <a href="downloads/GIF/grp-mutate.gif">GIF</a>, <a href="downloads/PDF/grp-mutate.pdf">static PDF</a>, <a href="downloads/SVG/grp-mutate.svg">static SVG</a>, <a href="downloads/PNG/grp-mutate@4x.png">static PNG</a>
+</li>
+<li>
+<code>group_by(cat1) |&gt; summarize()</code>: <a href="downloads/Video/grp-summarize-01.mp4">MP4</a>, <a href="downloads/GIF/grp-summarize-01.gif">GIF</a>, <a href="downloads/PDF/grp-summarize-01.pdf">static PDF</a>, <a href="downloads/SVG/grp-summarize-01.svg">static SVG</a>, <a href="downloads/PNG/grp-summarize-01@4x.png">static PNG</a>
+</li>
+<li>
+<code>group_by(cat2) |&gt; summarize()</code>: <a href="downloads/Video/grp-summarize-02.mp4">MP4</a>, <a href="downloads/GIF/grp-summarize-02.gif">GIF</a>, <a href="downloads/PDF/grp-summarize-02.pdf">static PDF</a>, <a href="downloads/SVG/grp-summarize-02.svg">static SVG</a>, <a href="downloads/PNG/grp-summarize-02@4x.png">static PNG</a>
+</li>
+<li>
+<code>group_by(cat1, cat2) |&gt; summarize()</code>: <a href="downloads/Video/grp-summarize-03.mp4">MP4</a>, <a href="downloads/GIF/grp-summarize-03.gif">GIF</a>, <a href="downloads/PDF/grp-summarize-03.pdf">static PDF</a>, <a href="downloads/SVG/grp-summarize-03.svg">static SVG</a>, <a href="downloads/PNG/grp-summarize-03@4x.png">static PNG</a>
+</li>
+</ul>
+<p>And for fun, here are all the original files:</p>
+<ul>
+<li><a href="downloads/illustrator-files.zip">Original Illustrator files</a></li>
+<li><a href="downloads/group_by-summarize-animations.zip">Original After Effects files</a></li>
+</ul>
+<p>They’re Creative Commons-licensed—do whatever you want with them!</p>
+</div>
+</div>
+<p>In this post, we’ll use these animations to explain each of these concepts and apply them to data from <a href="https://allisonhorst.github.io/palmerpenguins/">{palmerpenguins}</a>. Let’s load some packages and data first:</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org">tidyverse</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://allisonhorst.github.io/palmerpenguins/">palmerpenguins</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">penguins</span> <span class="op">&lt;-</span> <span class="va">penguins</span> <span class="op">|&gt;</span> <span class="fu">drop_na</span><span class="op">(</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="adding-new-columns-with-mutate" class="level2 page-columns page-full"><h2 class="anchored" data-anchor-id="adding-new-columns-with-mutate">Adding new columns with <code>mutate()</code>
+</h2>
+<p>The <code>mutate()</code> function in {dplyr} adds new columns. It’s not destructive—all our existing data will still be there after you add new columns<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></p>
+<div class="no-row-height column-margin column-container"><div id="fn2"><p><sup>2</sup>&nbsp;Unless we use an existing column name inside <code>mutate()</code>, in which case that column will get replaced with the new one.</p></div></div><div class="column-page-inset-right">
+<video controls="" width="100%" style="display: block; margin: auto;"><source src="downloads/Video/mutate.mp4" type="video/mp4"></video>
+</div>
+<p>&nbsp;</p>
+<p>By default, <code>mutate()</code> sticks the new column on the far right of the dataset (scroll over to the right to see <code>body_mass_kg</code> here):</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">penguins</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>body_mass_kg <span class="op">=</span> <span class="va">body_mass_g</span> <span class="op">/</span> <span class="fl">1000</span><span class="op">)</span></span>
+<span><span class="co">## # A tibble: 333 × 9</span></span>
+<span><span class="co">##    species island    bill_length_mm bill_depth_mm flipper_length_mm body_mass_g sex     year body_mass_kg</span></span>
+<span><span class="co">##    &lt;fct&gt;   &lt;fct&gt;              &lt;dbl&gt;         &lt;dbl&gt;             &lt;int&gt;       &lt;int&gt; &lt;fct&gt;  &lt;int&gt;        &lt;dbl&gt;</span></span>
+<span><span class="co">##  1 Adelie  Torgersen           39.1          18.7               181        3750 male    2007         3.75</span></span>
+<span><span class="co">##  2 Adelie  Torgersen           39.5          17.4               186        3800 female  2007         3.8 </span></span>
+<span><span class="co">##  3 Adelie  Torgersen           40.3          18                 195        3250 female  2007         3.25</span></span>
+<span><span class="co">##  4 Adelie  Torgersen           36.7          19.3               193        3450 female  2007         3.45</span></span>
+<span><span class="co">##  5 Adelie  Torgersen           39.3          20.6               190        3650 male    2007         3.65</span></span>
+<span><span class="co">##  6 Adelie  Torgersen           38.9          17.8               181        3625 female  2007         3.62</span></span>
+<span><span class="co">##  7 Adelie  Torgersen           39.2          19.6               195        4675 male    2007         4.68</span></span>
+<span><span class="co">##  8 Adelie  Torgersen           41.1          17.6               182        3200 female  2007         3.2 </span></span>
+<span><span class="co">##  9 Adelie  Torgersen           38.6          21.2               191        3800 male    2007         3.8 </span></span>
+<span><span class="co">## 10 Adelie  Torgersen           34.6          21.1               198        4400 male    2007         4.4 </span></span>
+<span><span class="co">## # ℹ 323 more rows</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We can also control where the new column shows up with either the <code>.before</code> or <code>.after</code> argument:</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">penguins</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">mutate</span><span class="op">(</span></span>
+<span>    body_mass_kg <span class="op">=</span> <span class="va">body_mass_g</span> <span class="op">/</span> <span class="fl">1000</span>,</span>
+<span>    .after <span class="op">=</span> <span class="va">island</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="co">## # A tibble: 333 × 9</span></span>
+<span><span class="co">##    species island    body_mass_kg bill_length_mm bill_depth_mm flipper_length_mm body_mass_g sex     year</span></span>
+<span><span class="co">##    &lt;fct&gt;   &lt;fct&gt;            &lt;dbl&gt;          &lt;dbl&gt;         &lt;dbl&gt;             &lt;int&gt;       &lt;int&gt; &lt;fct&gt;  &lt;int&gt;</span></span>
+<span><span class="co">##  1 Adelie  Torgersen         3.75           39.1          18.7               181        3750 male    2007</span></span>
+<span><span class="co">##  2 Adelie  Torgersen         3.8            39.5          17.4               186        3800 female  2007</span></span>
+<span><span class="co">##  3 Adelie  Torgersen         3.25           40.3          18                 195        3250 female  2007</span></span>
+<span><span class="co">##  4 Adelie  Torgersen         3.45           36.7          19.3               193        3450 female  2007</span></span>
+<span><span class="co">##  5 Adelie  Torgersen         3.65           39.3          20.6               190        3650 male    2007</span></span>
+<span><span class="co">##  6 Adelie  Torgersen         3.62           38.9          17.8               181        3625 female  2007</span></span>
+<span><span class="co">##  7 Adelie  Torgersen         4.68           39.2          19.6               195        4675 male    2007</span></span>
+<span><span class="co">##  8 Adelie  Torgersen         3.2            41.1          17.6               182        3200 female  2007</span></span>
+<span><span class="co">##  9 Adelie  Torgersen         3.8            38.6          21.2               191        3800 male    2007</span></span>
+<span><span class="co">## 10 Adelie  Torgersen         4.4            34.6          21.1               198        4400 male    2007</span></span>
+<span><span class="co">## # ℹ 323 more rows</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section><section id="summarizing-with-summarize" class="level2 page-columns page-full"><h2 class="anchored" data-anchor-id="summarizing-with-summarize">Summarizing with <code>summarize()</code>
+</h2>
+<p>The <code>summarize()</code> function, on the other hand, <em>is</em> destructive. It collapses our dataset into a single value and throws away any columns that we don’t use when summarizing.</p>
+<div class="column-page-inset-right">
+<video controls="" width="100%" style="display: block; margin: auto;"><source src="downloads/Video/grp-summarize-00.mp4" type="video/mp4"></video>
+</div>
+<p>&nbsp;</p>
+<p>After using <code>summarize()</code> on the penguins data, we only see three values in one row: average bill length, total penguin weight, and the number of penguins in the dataset. All other columns are gone.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">penguins</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">summarize</span><span class="op">(</span></span>
+<span>    avg_bill_length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">bill_length_mm</span><span class="op">)</span>,</span>
+<span>    total_weight <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">body_mass_g</span><span class="op">)</span>,</span>
+<span>    n_penguins <span class="op">=</span> <span class="fu">n</span><span class="op">(</span><span class="op">)</span>  <span class="co"># This returns the number of rows in the dataset</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="co">## # A tibble: 1 × 3</span></span>
+<span><span class="co">##   avg_bill_length total_weight n_penguins</span></span>
+<span><span class="co">##             &lt;dbl&gt;        &lt;int&gt;      &lt;int&gt;</span></span>
+<span><span class="co">## 1            44.0      1400950        333</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section><section id="grouping-and-ungrouping-with-group_by-and-ungroup" class="level2 page-columns page-full"><h2 class="anchored" data-anchor-id="grouping-and-ungrouping-with-group_by-and-ungroup">Grouping and ungrouping with <code>group_by()</code> and <code>ungroup()</code>
+</h2>
+<p>The <code>group_by()</code> function splits a dataset into smaller subsets based on the values of columns that we specify. Importantly, this splitting happens <strong><em>behind the scenes</em></strong>—you don’t actually ever see the data split up into smaller datasets.<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> To undo the grouping and bring all the rows back together, use <code>ungroup()</code>.</p>
+<div class="no-row-height column-margin column-container"><div id="fn3"><p><sup>3</sup>&nbsp;I like to imagine that the data is splitting into smaller groups, <a href="https://www.youtube.com/watch?v=NwVBzx0LMNQ">Minority Report</a>-style, or like <a href="https://www.youtube.com/watch?v=E7-o6a0OUHY">Tony Stark’s JARVIS-enabled HUD</a>.</p></div></div><div class="column-page-inset-right">
+<video controls="" width="100%" style="display: block; margin: auto;"><source src="downloads/Video/grp-ungroup.mp4" type="video/mp4"></video>
+</div>
+<p>&nbsp;</p>
+<p>Importantly, grouping doesn’t actually change the order of the rows in the dataset. If we use <code>group_by()</code> and look at your dataset, it’ll still be in the existing order. The only sign that the data is invisibly grouped is a little <code>Groups: sex [2]</code> note at the top of the output.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">penguins</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">group_by</span><span class="op">(</span><span class="va">sex</span><span class="op">)</span></span>
+<span><span class="co">## # A tibble: 333 × 8</span></span>
+<span><span class="co">## # Groups:   sex [2]</span></span>
+<span><span class="co">##    species island    bill_length_mm bill_depth_mm flipper_length_mm body_mass_g sex     year</span></span>
+<span><span class="co">##    &lt;fct&gt;   &lt;fct&gt;              &lt;dbl&gt;         &lt;dbl&gt;             &lt;int&gt;       &lt;int&gt; &lt;fct&gt;  &lt;int&gt;</span></span>
+<span><span class="co">##  1 Adelie  Torgersen           39.1          18.7               181        3750 male    2007</span></span>
+<span><span class="co">##  2 Adelie  Torgersen           39.5          17.4               186        3800 female  2007</span></span>
+<span><span class="co">##  3 Adelie  Torgersen           40.3          18                 195        3250 female  2007</span></span>
+<span><span class="co">##  4 Adelie  Torgersen           36.7          19.3               193        3450 female  2007</span></span>
+<span><span class="co">##  5 Adelie  Torgersen           39.3          20.6               190        3650 male    2007</span></span>
+<span><span class="co">##  6 Adelie  Torgersen           38.9          17.8               181        3625 female  2007</span></span>
+<span><span class="co">##  7 Adelie  Torgersen           39.2          19.6               195        4675 male    2007</span></span>
+<span><span class="co">##  8 Adelie  Torgersen           41.1          17.6               182        3200 female  2007</span></span>
+<span><span class="co">##  9 Adelie  Torgersen           38.6          21.2               191        3800 male    2007</span></span>
+<span><span class="co">## 10 Adelie  Torgersen           34.6          21.1               198        4400 male    2007</span></span>
+<span><span class="co">## # ℹ 323 more rows</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Grouping is fairly useless on its own, but it becomes really powerful when combined with <code>mutate()</code> or <code>summarize()</code>.</p>
+</section><section id="mutating-within-groups" class="level2 page-columns page-full"><h2 class="anchored" data-anchor-id="mutating-within-groups">Mutating within groups</h2>
+<p>If we use <code>mutate()</code> after grouping, new columns are added to each subset separately. In many cases, you won’t notice any difference between using <code>mutate()</code> on an ungrouped or grouped dataset—you’ll get the same values. For instance, if we use <code>mutate(body_mass_kg = body_mass_g / 1000)</code> on an ungrouped dataset, R will create a column for the whole dataset that divides <code>body_mass_g</code> by 1,000; if we use <code>mutate(body_mass_kg = body_mass_g / 1000)</code> on a <em>grouped</em> dataset, R will create a new column <em>within each of the subsets</em>. Both approaches will generate the same values.<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a></p>
+<div class="no-row-height column-margin column-container"><div id="fn4"><p><sup>4</sup>&nbsp;Using <code>mutate()</code> on the grouped dataset will be a tiiiiiny bit slower because it’s actually running <code>mutate()</code> on each of the groups.</p></div></div><p>This is actually important if we’re referencing other values within the group. In the example above, we created a new column <code>y</code> that subtracted the smallest value of <code>x</code> from each value of <code>x</code>. When running <code>mutate(y = x - min(x))</code> on the ungrouped dataset, the smallest value of <code>x</code> is 1, so all the numbers decrease by 1. When running <code>mutate(y = x * 2)</code> on a <em>grouped</em> dataset, though, <code>min(x)</code> refers to the smallest value of <code>x</code> <em>within each of the subsets</em>. Check out this example here: the minimum values in groups A, B, and C are 1, 4, and 7 respectively, so in subset A we subtract 1 from all the values of <code>x</code>, in subset B we subtract 4 from all the values of <code>x</code>, and in subset C we subtract 7 from all the values of <code>x</code>. As a result, the new <code>y</code> column contains 0, 1, and 2 in each of the groups:</p>
+<div class="column-page-inset-right">
+<video controls="" width="100%" style="display: block; margin: auto;"><source src="downloads/Video/grp-mutate.mp4" type="video/mp4"></video>
+</div>
+<p>&nbsp;</p>
+<p>Panel data (or time-series cross-sectional data, like the gapminder dataset) is good example of a situation where grouping and mutating is important. For example, we can use <code><a href="https://rdrr.io/r/stats/lag.html">lag()</a></code> to create a new column (<code>lifeExp_previous</code>) that shows the previous year’s life expectancy.<a href="#fn5" class="footnote-ref" id="fnref5" role="doc-noteref"><sup>5</sup></a></p>
+<div class="no-row-height column-margin column-container"><div id="fn5"><p><sup>5</sup>&nbsp;This is super common with models where you time-shifted variables, like predicting an outcome based on covariates in the previous year.</p></div></div><div class="cell" data-layout-align="center">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/jennybc/gapminder">gapminder</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">gapminder_smaller</span> <span class="op">&lt;-</span> <span class="va">gapminder</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">year</span> <span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1997</span>, <span class="fl">2002</span>, <span class="fl">2007</span><span class="op">)</span><span class="op">)</span>  <span class="co"># Only show a few years</span></span>
+<span>  </span>
+<span><span class="va">gapminder_smaller</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>lifeExp_previous <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/lag.html">lag</a></span><span class="op">(</span><span class="va">lifeExp</span><span class="op">)</span>, .after <span class="op">=</span> <span class="va">lifeExp</span><span class="op">)</span></span>
+<span><span class="co">## # A tibble: 426 × 7</span></span>
+<span><span class="co">##    country     continent  year lifeExp lifeExp_previous      pop gdpPercap</span></span>
+<span><span class="co">##    &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;            &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;</span></span>
+<span><span class="co">##  1 Afghanistan Asia       1997    41.8             NA   22227415      635.</span></span>
+<span><span class="co">##  2 Afghanistan Asia       2002    42.1             41.8 25268405      727.</span></span>
+<span><span class="co">##  3 Afghanistan Asia       2007    43.8             42.1 31889923      975.</span></span>
+<span><span class="co">##  4 Albania     Europe     1997    73.0             43.8  3428038     3193.</span></span>
+<span><span class="co">##  5 Albania     Europe     2002    75.7             73.0  3508512     4604.</span></span>
+<span><span class="co">##  6 Albania     Europe     2007    76.4             75.7  3600523     5937.</span></span>
+<span><span class="co">##  7 Algeria     Africa     1997    69.2             76.4 29072015     4797.</span></span>
+<span><span class="co">##  8 Algeria     Africa     2002    71.0             69.2 31287142     5288.</span></span>
+<span><span class="co">##  9 Algeria     Africa     2007    72.3             71.0 33333216     6223.</span></span>
+<span><span class="co">## 10 Angola      Africa     1997    41.0             72.3  9875024     2277.</span></span>
+<span><span class="co">## # ℹ 416 more rows</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Afghanistan in 1997 has a lagged life expectancy of <code>NA</code>, but that’s fine and to be expected—there’s no row for it to look at and copy the value (i.e.&nbsp;there’s no Afghanistan 1992 row). Afghanistan’s lagged life expectancy in 2002 is the same value as the actual life expectancy in 1997. Great, it worked!<a href="#fn6" class="footnote-ref" id="fnref6" role="doc-noteref"><sup>6</sup></a></p>
+<div class="no-row-height column-margin column-container"><div id="fn6"><p><sup>6</sup>&nbsp;Technically this isn’t a one-year lag; this is a five-year lag, since the data is spaced every 5 years.</p></div></div><p>But look at Albania’s lagged life expectancy in 1997—it’s 43.84, which is actually Afghanistan’s 2007 life expectancy! Lagged values bleed across countries here.</p>
+<p>If we group the data by country before lagging, though, the lagging happens <em>within each of the subsets</em>, so the first year of every country is missing (since there’s no previous year to look at). Now every country’s 1997 value is <code>NA</code>, since the new column was created separately in each of the smaller behind-the-scenes country-specific datasets:</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">gapminder_smaller</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">group_by</span><span class="op">(</span><span class="va">country</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>lifeExp_previous <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/lag.html">lag</a></span><span class="op">(</span><span class="va">lifeExp</span><span class="op">)</span>, .after <span class="op">=</span> <span class="va">lifeExp</span><span class="op">)</span></span>
+<span><span class="co">## # A tibble: 426 × 7</span></span>
+<span><span class="co">## # Groups:   country [142]</span></span>
+<span><span class="co">##    country     continent  year lifeExp lifeExp_previous      pop gdpPercap</span></span>
+<span><span class="co">##    &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;            &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;</span></span>
+<span><span class="co">##  1 Afghanistan Asia       1997    41.8             NA   22227415      635.</span></span>
+<span><span class="co">##  2 Afghanistan Asia       2002    42.1             41.8 25268405      727.</span></span>
+<span><span class="co">##  3 Afghanistan Asia       2007    43.8             42.1 31889923      975.</span></span>
+<span><span class="co">##  4 Albania     Europe     1997    73.0             NA    3428038     3193.</span></span>
+<span><span class="co">##  5 Albania     Europe     2002    75.7             73.0  3508512     4604.</span></span>
+<span><span class="co">##  6 Albania     Europe     2007    76.4             75.7  3600523     5937.</span></span>
+<span><span class="co">##  7 Algeria     Africa     1997    69.2             NA   29072015     4797.</span></span>
+<span><span class="co">##  8 Algeria     Africa     2002    71.0             69.2 31287142     5288.</span></span>
+<span><span class="co">##  9 Algeria     Africa     2007    72.3             71.0 33333216     6223.</span></span>
+<span><span class="co">## 10 Angola      Africa     1997    41.0             NA    9875024     2277.</span></span>
+<span><span class="co">## # ℹ 416 more rows</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section><section id="summarizing-groups-with-group_by-summarize" class="level2 page-columns page-full"><h2 class="anchored" data-anchor-id="summarizing-groups-with-group_by-summarize">Summarizing groups with <code>group_by() |&gt; summarize()</code>
+</h2>
+<p>While collapsing an entire dataset can be helpful for finding overall summary statistics (e.g.&nbsp;the average, minimum, and maximum values for columns you’re interested in), <code>summarize()</code> is better used with groups. If we use <code>summarize()</code> on a <em>grouped</em> dataset, <em>each subset is collapsed into a single row</em>. This will create different summary values, depending on the groups you use. In this example, grouping by <code>cat1</code> gives us a summarized dataset with three rows (for <code>a</code>, <code>b</code>, and <code>c</code>):</p>
+<div class="column-page-inset-right">
+<video controls="" width="100%" style="display: block; margin: auto;"><source src="downloads/Video/grp-summarize-01.mp4" type="video/mp4"></video>
+</div>
+<p>&nbsp;</p>
+<p>While here, if we group by <code>cat2</code>, we get a summarized dataset with two rows (for <code>j</code> and <code>k</code>):</p>
+<div class="column-page-inset-right">
+<video controls="" width="100%" style="display: block; margin: auto;"><source src="downloads/Video/grp-summarize-02.mp4" type="video/mp4"></video>
+</div>
+<p>&nbsp;</p>
+<p>If we use <code>group_by()</code> before summarizing the penguins data, we’ll get a column for the group, along with average bill length, total penguin weight, and the number of penguins <em>in each group</em>. As before, all other columns are gone.</p>
+<p>We can see summarized values by species:</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">penguins</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">group_by</span><span class="op">(</span><span class="va">species</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">summarize</span><span class="op">(</span></span>
+<span>    avg_bill_length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">bill_length_mm</span><span class="op">)</span>,</span>
+<span>    total_weight <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">body_mass_g</span><span class="op">)</span>,</span>
+<span>    n_penguins <span class="op">=</span> <span class="fu">n</span><span class="op">(</span><span class="op">)</span>  <span class="co"># This returns the number of rows in each group</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="co">## # A tibble: 3 × 4</span></span>
+<span><span class="co">##   species   avg_bill_length total_weight n_penguins</span></span>
+<span><span class="co">##   &lt;fct&gt;               &lt;dbl&gt;        &lt;int&gt;      &lt;int&gt;</span></span>
+<span><span class="co">## 1 Adelie               38.8       541100        146</span></span>
+<span><span class="co">## 2 Chinstrap            48.8       253850         68</span></span>
+<span><span class="co">## 3 Gentoo               47.6       606000        119</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>…or by sex…</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">penguins</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">group_by</span><span class="op">(</span><span class="va">sex</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">summarize</span><span class="op">(</span></span>
+<span>    avg_bill_length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">bill_length_mm</span><span class="op">)</span>,</span>
+<span>    total_weight <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">body_mass_g</span><span class="op">)</span>,</span>
+<span>    n_penguins <span class="op">=</span> <span class="fu">n</span><span class="op">(</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="co">## # A tibble: 2 × 4</span></span>
+<span><span class="co">##   sex    avg_bill_length total_weight n_penguins</span></span>
+<span><span class="co">##   &lt;fct&gt;            &lt;dbl&gt;        &lt;int&gt;      &lt;int&gt;</span></span>
+<span><span class="co">## 1 female            42.1       637275        165</span></span>
+<span><span class="co">## 2 male              45.9       763675        168</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>…or by any other column.</p>
+<div class="callout callout-style-default callout-caution callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Grouping by numeric columns
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>One common mistake is to feed a numeric columns into <code>group_by()</code>, like this:</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">penguins</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">group_by</span><span class="op">(</span><span class="va">flipper_length_mm</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">summarize</span><span class="op">(</span></span>
+<span>    avg_bill_length <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">bill_length_mm</span><span class="op">)</span>,</span>
+<span>    total_weight <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">body_mass_g</span><span class="op">)</span>,</span>
+<span>    n_penguins <span class="op">=</span> <span class="fu">n</span><span class="op">(</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="co">## # A tibble: 54 × 4</span></span>
+<span><span class="co">##    flipper_length_mm avg_bill_length total_weight n_penguins</span></span>
+<span><span class="co">##                &lt;int&gt;           &lt;dbl&gt;        &lt;int&gt;      &lt;int&gt;</span></span>
+<span><span class="co">##  1               172            37.9         3150          1</span></span>
+<span><span class="co">##  2               174            37.8         3400          1</span></span>
+<span><span class="co">##  3               176            40.2         3450          1</span></span>
+<span><span class="co">##  4               178            39.0        13300          4</span></span>
+<span><span class="co">##  5               180            39.8        14900          4</span></span>
+<span><span class="co">##  6               181            41.5        24000          7</span></span>
+<span><span class="co">##  7               182            39.6         9775          3</span></span>
+<span><span class="co">##  8               183            39.2         6625          2</span></span>
+<span><span class="co">##  9               184            37.9        25650          7</span></span>
+<span><span class="co">## 10               185            38.0        31550          9</span></span>
+<span><span class="co">## # ℹ 44 more rows</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>This technically calculates <em>something</em>, but it’s generally not what you’re looking for. R is making groups for each of the unique values of flipper length and then calculating summaries for those groups. There’s only one penguin with a flipper length of 172 mm; there are 7 with 181 mm. Grouping by a numeric variable can be useful if you want to create a histogram-like table of counts of unique values, but most of the time, you don’t want to do this.</p>
+</div>
+</div>
+</section><section id="summarizing-multiple-groups" class="level2 page-columns page-full"><h2 class="anchored" data-anchor-id="summarizing-multiple-groups">Summarizing multiple groups</h2>
+<p>We can specify more than one group with <code>group_by()</code>, which will create behind-the-scenes datasets for each unique combination of values in the groups. Here, when group by both <code>cat1</code> and <code>cat2</code>, we get six groups (<code>a &amp; j</code>, <code>a &amp; k</code>, <code>b &amp; j</code>, <code>b &amp; k</code>, <code>c &amp; j</code>, <code>c &amp; k</code>), which we can then use with <code>mutate()</code> or <code>summarize()</code>:</p>
+<div class="column-page-inset-right">
+<video controls="" width="100%" style="display: block; margin: auto;"><source src="downloads/Video/grp-summarize-03.mp4" type="video/mp4"></video>
+</div>
+<p>&nbsp;</p>
+</section><section id="leftover-groupings-and-ungroup" class="level2"><h2 class="anchored" data-anchor-id="leftover-groupings-and-ungroup">Leftover groupings and <code>ungroup()</code>
+</h2>
+<p>Some subtle and interesting things happen when summarizing with multiple groups, though, and they throw people off all the time.</p>
+<p>When you use <code>summarize()</code> on a grouped dataset, <strong>{dplyr} will automatically ungroup the last of the groups</strong>. This happens invisibly when you’re only grouping by one thing. For example, this has three rows, and no <code>Groups: species[3]</code> note at the top:</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">penguins</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">group_by</span><span class="op">(</span><span class="va">species</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">summarize</span><span class="op">(</span>total <span class="op">=</span> <span class="fu">n</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">## # A tibble: 3 × 2</span></span>
+<span><span class="co">##   species   total</span></span>
+<span><span class="co">##   &lt;fct&gt;     &lt;int&gt;</span></span>
+<span><span class="co">## 1 Adelie      146</span></span>
+<span><span class="co">## 2 Chinstrap    68</span></span>
+<span><span class="co">## 3 Gentoo      119</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>When grouping by multiple things, {dplyr} will automatically ungroup the last of the groups (i.e.&nbsp;the right-most group), but keep everything else grouped. This has six rows and is grouped by species (hence the <code>Groups: species [3]</code>), and R gives you an extra message alerting you to the fact that it’s still grouped by something: <code>`summarise()` has grouped output by 'species'.</code></p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">penguins</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">group_by</span><span class="op">(</span><span class="va">species</span>, <span class="va">sex</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">summarize</span><span class="op">(</span>total <span class="op">=</span> <span class="fu">n</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">## `summarise()` has grouped output by 'species'. You can override using the `.groups` argument.</span></span>
+<span><span class="co">## # A tibble: 6 × 3</span></span>
+<span><span class="co">## # Groups:   species [3]</span></span>
+<span><span class="co">##   species   sex    total</span></span>
+<span><span class="co">##   &lt;fct&gt;     &lt;fct&gt;  &lt;int&gt;</span></span>
+<span><span class="co">## 1 Adelie    female    73</span></span>
+<span><span class="co">## 2 Adelie    male      73</span></span>
+<span><span class="co">## 3 Chinstrap female    34</span></span>
+<span><span class="co">## 4 Chinstrap male      34</span></span>
+<span><span class="co">## 5 Gentoo    female    58</span></span>
+<span><span class="co">## 6 Gentoo    male      61</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The same thing happens in reverse if we switch species and sex. The results here are still grouped by sex:</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">penguins</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">group_by</span><span class="op">(</span><span class="va">sex</span>, <span class="va">species</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">summarize</span><span class="op">(</span>total <span class="op">=</span> <span class="fu">n</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">## `summarise()` has grouped output by 'sex'. You can override using the `.groups` argument.</span></span>
+<span><span class="co">## # A tibble: 6 × 3</span></span>
+<span><span class="co">## # Groups:   sex [2]</span></span>
+<span><span class="co">##   sex    species   total</span></span>
+<span><span class="co">##   &lt;fct&gt;  &lt;fct&gt;     &lt;int&gt;</span></span>
+<span><span class="co">## 1 female Adelie       73</span></span>
+<span><span class="co">## 2 female Chinstrap    34</span></span>
+<span><span class="co">## 3 female Gentoo       58</span></span>
+<span><span class="co">## 4 male   Adelie       73</span></span>
+<span><span class="co">## 5 male   Chinstrap    34</span></span>
+<span><span class="co">## 6 male   Gentoo       61</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We can use <code>ungroup()</code> to bring the data all the way back together and get rid of the groups:</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">penguins</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">group_by</span><span class="op">(</span><span class="va">species</span>, <span class="va">sex</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">summarize</span><span class="op">(</span>total <span class="op">=</span> <span class="fu">n</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">ungroup</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">## `summarise()` has grouped output by 'species'. You can override using the `.groups` argument.</span></span>
+<span><span class="co">## # A tibble: 6 × 3</span></span>
+<span><span class="co">##   species   sex    total</span></span>
+<span><span class="co">##   &lt;fct&gt;     &lt;fct&gt;  &lt;int&gt;</span></span>
+<span><span class="co">## 1 Adelie    female    73</span></span>
+<span><span class="co">## 2 Adelie    male      73</span></span>
+<span><span class="co">## 3 Chinstrap female    34</span></span>
+<span><span class="co">## 4 Chinstrap male      34</span></span>
+<span><span class="co">## 5 Gentoo    female    58</span></span>
+<span><span class="co">## 6 Gentoo    male      61</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Alternatively, <code>summarize</code> has a <code>.groups</code> argument that you can use to control what happens to the groups after you summarize. By default, it uses <code>.groups = "drop_last"</code> and gets rid of the right-most group, but you can also drop all the groups (<code>.groups = "drop"</code>) and keep all the groups (<code>.groups = "keep"</code>). See? No groups!</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">penguins</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">group_by</span><span class="op">(</span><span class="va">species</span>, <span class="va">sex</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">summarize</span><span class="op">(</span>total <span class="op">=</span> <span class="fu">n</span><span class="op">(</span><span class="op">)</span>, .groups <span class="op">=</span> <span class="st">"drop"</span><span class="op">)</span></span>
+<span><span class="co">## # A tibble: 6 × 3</span></span>
+<span><span class="co">##   species   sex    total</span></span>
+<span><span class="co">##   &lt;fct&gt;     &lt;fct&gt;  &lt;int&gt;</span></span>
+<span><span class="co">## 1 Adelie    female    73</span></span>
+<span><span class="co">## 2 Adelie    male      73</span></span>
+<span><span class="co">## 3 Chinstrap female    34</span></span>
+<span><span class="co">## 4 Chinstrap male      34</span></span>
+<span><span class="co">## 5 Gentoo    female    58</span></span>
+<span><span class="co">## 6 Gentoo    male      61</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Experimental different way of grouping and summarizing
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>With newer versions of {dplyr} there’s a new experimental way to specify groups when summarizing, borrowed from <a href="https://rdatatable.gitlab.io/data.table/">{data.table}</a>. Rather than specify groups in an explicit <code>group_by()</code> function, you can do it inside <code>summarize()</code> with the <code>.by</code> argument:</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">penguins</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">summarize</span><span class="op">(</span>total <span class="op">=</span> <span class="fu">n</span><span class="op">(</span><span class="op">)</span>, .by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">species</span>, <span class="va">sex</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">## # A tibble: 6 × 3</span></span>
+<span><span class="co">##   species   sex    total</span></span>
+<span><span class="co">##   &lt;fct&gt;     &lt;fct&gt;  &lt;int&gt;</span></span>
+<span><span class="co">## 1 Adelie    male      73</span></span>
+<span><span class="co">## 2 Adelie    female    73</span></span>
+<span><span class="co">## 3 Gentoo    female    58</span></span>
+<span><span class="co">## 4 Gentoo    male      61</span></span>
+<span><span class="co">## 5 Chinstrap female    34</span></span>
+<span><span class="co">## 6 Chinstrap male      34</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>This automatically ungroups everything when it’s done, so you don’t have any leftover groupings.</p>
+</div>
+</div>
+</section><section id="why-care-about-leftover-groups" class="level2 page-columns page-full"><h2 class="anchored" data-anchor-id="why-care-about-leftover-groups">Why care about leftover groups?</h2>
+<p>Lots of the time, you don’t actually need to worry about leftover groupings. If you’re plotting or modeling or doing other stuff with the data, those functions will ignore the groups and work on the whole dataset. For example, I do stuff like calculating and plotting group summaries all the time—<code>plot_data</code> here is still grouped by <code>species</code> after summarizing, but <code>ggplot()</code> doesn’t care:</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">plot_data</span> <span class="op">&lt;-</span> <span class="va">penguins</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">group_by</span><span class="op">(</span><span class="va">species</span>, <span class="va">sex</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">summarize</span><span class="op">(</span>total <span class="op">=</span> <span class="fu">n</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">## `summarise()` has grouped output by 'species'. You can override using the `.groups` argument.</span></span>
+<span></span>
+<span><span class="co"># plot_data is grouped by sex, but that doesn't matter here</span></span>
+<span><span class="fu">ggplot</span><span class="op">(</span><span class="va">plot_data</span>, <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">species</span>, y <span class="op">=</span> <span class="va">total</span>, fill <span class="op">=</span> <span class="va">species</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_col</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu">guides</span><span class="op">(</span>fill <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">facet_wrap</span><span class="op">(</span><span class="fu">vars</span><span class="op">(</span><span class="va">sex</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure"><p><img src="index_files/figure-html/plot-grouped-data-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:90.0%"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Leftover groups are <strong><em>very important</em></strong> when you use things like <code>mutate()</code> on the summarized dataset.</p>
+<p>Like here, we’ll create a proportion column based on <code>total / sum(total)</code>. Because we only grouped by one thing, there are no leftover groupings, so the <code>prop</code> column adds up to 100%:</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">penguins</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">group_by</span><span class="op">(</span><span class="va">species</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">summarize</span><span class="op">(</span>total <span class="op">=</span> <span class="fu">n</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>prop <span class="op">=</span> <span class="va">total</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">total</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">## # A tibble: 3 × 3</span></span>
+<span><span class="co">##   species   total  prop</span></span>
+<span><span class="co">##   &lt;fct&gt;     &lt;int&gt; &lt;dbl&gt;</span></span>
+<span><span class="co">## 1 Adelie      146 0.438</span></span>
+<span><span class="co">## 2 Chinstrap    68 0.204</span></span>
+<span><span class="co">## 3 Gentoo      119 0.357</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Next, we’ll group by two things, which creates behind-the-scenes datasets for all the six combinations of species and sex. When {dplyr} is done, it ungroups the sex group, but leaves the dataset grouped by species. The <code>prop</code> column no longer adds up to 100%; it adds to 300%. That’s because it calculated <code>total/sum(total)</code> <em>within</em> each species group (so 50% of Adélies are female, 50% are male, etc.)</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">penguins</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">group_by</span><span class="op">(</span><span class="va">species</span>, <span class="va">sex</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">summarize</span><span class="op">(</span>total <span class="op">=</span> <span class="fu">n</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>prop <span class="op">=</span> <span class="va">total</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">total</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">## `summarise()` has grouped output by 'species'. You can override using the `.groups` argument.</span></span>
+<span><span class="co">## # A tibble: 6 × 4</span></span>
+<span><span class="co">## # Groups:   species [3]</span></span>
+<span><span class="co">##   species   sex    total  prop</span></span>
+<span><span class="co">##   &lt;fct&gt;     &lt;fct&gt;  &lt;int&gt; &lt;dbl&gt;</span></span>
+<span><span class="co">## 1 Adelie    female    73 0.5  </span></span>
+<span><span class="co">## 2 Adelie    male      73 0.5  </span></span>
+<span><span class="co">## 3 Chinstrap female    34 0.5  </span></span>
+<span><span class="co">## 4 Chinstrap male      34 0.5  </span></span>
+<span><span class="co">## 5 Gentoo    female    58 0.487</span></span>
+<span><span class="co">## 6 Gentoo    male      61 0.513</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>If we reverse the grouping order so that sex comes first, {dplyr} will automatically stop grouping by species and keep the dataset grouped by sex. That means <code>mutate()</code> will work <em>within</em> each sex group, so the <code>prop</code> column here adds to 200%. 44% of female penguins are Adélies, 21% of female penguins are Chinstraps, and 35% of female penguins are Gentoos, and so on.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">penguins</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">group_by</span><span class="op">(</span><span class="va">sex</span>, <span class="va">species</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">summarize</span><span class="op">(</span>total <span class="op">=</span> <span class="fu">n</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>prop <span class="op">=</span> <span class="va">total</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">total</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">## `summarise()` has grouped output by 'sex'. You can override using the `.groups` argument.</span></span>
+<span><span class="co">## # A tibble: 6 × 4</span></span>
+<span><span class="co">## # Groups:   sex [2]</span></span>
+<span><span class="co">##   sex    species   total  prop</span></span>
+<span><span class="co">##   &lt;fct&gt;  &lt;fct&gt;     &lt;int&gt; &lt;dbl&gt;</span></span>
+<span><span class="co">## 1 female Adelie       73 0.442</span></span>
+<span><span class="co">## 2 female Chinstrap    34 0.206</span></span>
+<span><span class="co">## 3 female Gentoo       58 0.352</span></span>
+<span><span class="co">## 4 male   Adelie       73 0.435</span></span>
+<span><span class="co">## 5 male   Chinstrap    34 0.202</span></span>
+<span><span class="co">## 6 male   Gentoo       61 0.363</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>If we explicitly ungroup before calculating the proportion,<a href="#fn7" class="footnote-ref" id="fnref7" role="doc-noteref"><sup>7</sup></a> then <code>mutate()</code> will work on the whole dataset instead of sex- or species-specific groups. Here, 22% of all penguins are female Adélies, 10% are female Chinstraps, etc.</p>
+<div class="no-row-height column-margin column-container"><div id="fn7"><p><sup>7</sup>&nbsp;Or use the <code>.groups</code> argument or <code>.by</code> argument in <code>summarize()</code></p></div></div><div class="cell" data-layout-align="center">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">penguins</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">group_by</span><span class="op">(</span><span class="va">sex</span>, <span class="va">species</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">summarize</span><span class="op">(</span>total <span class="op">=</span> <span class="fu">n</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">ungroup</span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>prop <span class="op">=</span> <span class="va">total</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">total</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">## `summarise()` has grouped output by 'sex'. You can override using the `.groups` argument.</span></span>
+<span><span class="co">## # A tibble: 6 × 4</span></span>
+<span><span class="co">##   sex    species   total  prop</span></span>
+<span><span class="co">##   &lt;fct&gt;  &lt;fct&gt;     &lt;int&gt; &lt;dbl&gt;</span></span>
+<span><span class="co">## 1 female Adelie       73 0.219</span></span>
+<span><span class="co">## 2 female Chinstrap    34 0.102</span></span>
+<span><span class="co">## 3 female Gentoo       58 0.174</span></span>
+<span><span class="co">## 4 male   Adelie       73 0.219</span></span>
+<span><span class="co">## 5 male   Chinstrap    34 0.102</span></span>
+<span><span class="co">## 6 male   Gentoo       61 0.183</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We don’t have to rely on {dplyr}’s automatic ungroup-the-last-grouping feature and we can add our own grouping explicitly later. Like here, {dplyr} stops grouping by sex, which means that the <code>prop</code> column would add to 300%, showing the proportion of sexes within each species. But if we throw in a <code>group_by(sex)</code> before <code>mutate()</code>, it’ll put everything in two behind-the-scenes datasets (male and female) and calculate the proportion of species within each sex. The resulting dataset is still grouped by sex, since <code>mutate()</code> doesn’t drop any groups like <code>summarize()</code>:</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">penguins</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">group_by</span><span class="op">(</span><span class="va">species</span>, <span class="va">sex</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">summarize</span><span class="op">(</span>total <span class="op">=</span> <span class="fu">n</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">group_by</span><span class="op">(</span><span class="va">sex</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>prop <span class="op">=</span> <span class="va">total</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">total</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">## `summarise()` has grouped output by 'species'. You can override using the `.groups` argument.</span></span>
+<span><span class="co">## # A tibble: 6 × 4</span></span>
+<span><span class="co">## # Groups:   sex [2]</span></span>
+<span><span class="co">##   species   sex    total  prop</span></span>
+<span><span class="co">##   &lt;fct&gt;     &lt;fct&gt;  &lt;int&gt; &lt;dbl&gt;</span></span>
+<span><span class="co">## 1 Adelie    female    73 0.442</span></span>
+<span><span class="co">## 2 Adelie    male      73 0.435</span></span>
+<span><span class="co">## 3 Chinstrap female    34 0.206</span></span>
+<span><span class="co">## 4 Chinstrap male      34 0.202</span></span>
+<span><span class="co">## 5 Gentoo    female    58 0.352</span></span>
+<span><span class="co">## 6 Gentoo    male      61 0.363</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+
+
+<!-- -->
+
+</section><div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{heiss2024,
+  author = {Heiss, Andrew},
+  title = {Visualizing \{Dplyr\}’s Mutate(), Summarize(), Group\_by(),
+    and Ungroup() with Animations},
+  date = {2024-04-04},
+  url = {https://www.andrewheiss.com/blog/2024/04/04/group_by-summarize-ungroup-animations/},
+  doi = {10.59350/d2sz4-w4e25},
+  langid = {en}
+}
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-heiss2024" class="csl-entry quarto-appendix-citeas" role="listitem">
+Heiss, Andrew. 2024. <span>“Visualizing {Dplyr}’s Mutate(), Summarize(),
+Group_by(), and Ungroup() with Animations.”</span> April 4, 2024. <a href="https://doi.org/10.59350/d2sz4-w4e25">https://doi.org/10.59350/d2sz4-w4e25</a>.
+</div></div></section></div></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+  const viewSource = window.document.getElementById('quarto-view-source') ||
+                     window.document.getElementById('quarto-code-tools-source');
+  if (viewSource) {
+    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+    viewSource.addEventListener("click", function(e) {
+      if (sourceUrl) {
+        // rstudio viewer pane
+        if (/\bcapabilities=\b/.test(window.location)) {
+          window.open(sourceUrl);
+        } else {
+          window.location.href = sourceUrl;
+        }
+      } else {
+        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+        modal.show();
+      }
+      return false;
+    });
+  }
+  function toggleCodeHandler(show) {
+    return function(e) {
+      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+      for (let i=0; i<detailsSrc.length; i++) {
+        const details = detailsSrc[i].parentElement;
+        if (show) {
+          details.open = true;
+        } else {
+          details.removeAttribute("open");
+        }
+      }
+      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+      const fromCls = show ? "hidden" : "unhidden";
+      const toCls = show ? "unhidden" : "hidden";
+      for (let i=0; i<cellCodeDivs.length; i++) {
+        const codeDiv = cellCodeDivs[i];
+        if (codeDiv.classList.contains(fromCls)) {
+          codeDiv.classList.remove(fromCls);
+          codeDiv.classList.add(toCls);
+        } 
+      }
+      return false;
+    }
+  }
+  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+  if (hideAllCode) {
+    hideAllCode.addEventListener("click", toggleCodeHandler(false));
+  }
+  const showAllCode = window.document.getElementById("quarto-show-all-code");
+  if (showAllCode) {
+    showAllCode.addEventListener("click", toggleCodeHandler(true));
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/www\.andrewheiss\.com");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script><script src="https://giscus.app/client.js" data-repo="andrewheiss/ath-quarto" data-repo-id="R_kgDOIg6EJQ" data-category="Blog comments" data-category-id="DIC_kwDOIg6EJc4CSz92" data-mapping="pathname" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="top" data-theme="light" data-lang="en" crossorigin="anonymous" async="">
+</script><input type="hidden" id="giscus-base-theme" value="light"><input type="hidden" id="giscus-alt-theme" value="dark"><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="sourceCode" id="cb23" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Visualizing {dplyr}'s mutate(), summarize(), group_by(), and ungroup() with animations"</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="an">date:</span><span class="co"> 2024-04-04</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="an">description:</span><span class="co"> "Visually explore how {dplyr}'s more complex core functions work together to wrangle data"</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="an">image:</span><span class="co"> "downloads/PNG/grp-summarize-02@4x.png"</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="an">twitter-card:</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="co">  image: "downloads/PNG/grp-summarize-02@4x.png"</span></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a><span class="an">open-graph:</span></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a><span class="co">  image: "downloads/PNG/grp-summarize-02@4x.png"</span></span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a><span class="an">categories:</span></span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a><span class="co">  - r</span></span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a><span class="co">  - tidyverse</span></span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a><span class="co">  - dplyr</span></span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a><span class="co">  - animations</span></span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a><span class="an">resources:</span></span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a><span class="co">  - "downloads/**"</span></span>
+<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span></span>
+<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a><span class="co">  html: </span></span>
+<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a><span class="co">    shift-heading-level-by: 1</span></span>
+<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a><span class="an">doi:</span><span class="co"> 10.59350/d2sz4-w4e25</span></span>
+<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a><span class="an">citation:</span><span class="co"> true</span></span>
+<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb23-23"><a href="#cb23-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-26"><a href="#cb23-26" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb23-27"><a href="#cb23-27" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: setup</span></span>
+<span id="cb23-28"><a href="#cb23-28" aria-hidden="true" tabindex="-1"></a><span class="co">#| include: false</span></span>
+<span id="cb23-29"><a href="#cb23-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-30"><a href="#cb23-30" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span>opts_chunk<span class="sc">$</span><span class="fu">set</span>(</span>
+<span id="cb23-31"><a href="#cb23-31" aria-hidden="true" tabindex="-1"></a>  <span class="at">fig.width =</span> <span class="dv">6</span>,</span>
+<span id="cb23-32"><a href="#cb23-32" aria-hidden="true" tabindex="-1"></a>  <span class="at">fig.height =</span> <span class="dv">6</span> <span class="sc">*</span> <span class="fl">0.618</span>,</span>
+<span id="cb23-33"><a href="#cb23-33" aria-hidden="true" tabindex="-1"></a>  <span class="at">fig.retina =</span> <span class="dv">3</span>,</span>
+<span id="cb23-34"><a href="#cb23-34" aria-hidden="true" tabindex="-1"></a>  <span class="at">dev =</span> <span class="st">"ragg_png"</span>,</span>
+<span id="cb23-35"><a href="#cb23-35" aria-hidden="true" tabindex="-1"></a>  <span class="at">fig.align =</span> <span class="st">"center"</span>,</span>
+<span id="cb23-36"><a href="#cb23-36" aria-hidden="true" tabindex="-1"></a>  <span class="at">out.width =</span> <span class="st">"90%"</span>,</span>
+<span id="cb23-37"><a href="#cb23-37" aria-hidden="true" tabindex="-1"></a>  <span class="at">collapse =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb23-38"><a href="#cb23-38" aria-hidden="true" tabindex="-1"></a>  <span class="at">cache.extra =</span> <span class="dv">1234</span>  <span class="co"># Change number to invalidate cache</span></span>
+<span id="cb23-39"><a href="#cb23-39" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb23-40"><a href="#cb23-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-41"><a href="#cb23-41" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(</span>
+<span id="cb23-42"><a href="#cb23-42" aria-hidden="true" tabindex="-1"></a>  <span class="at">digits =</span> <span class="dv">4</span>,</span>
+<span id="cb23-43"><a href="#cb23-43" aria-hidden="true" tabindex="-1"></a>  <span class="at">width =</span> <span class="dv">300</span></span>
+<span id="cb23-44"><a href="#cb23-44" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb23-45"><a href="#cb23-45" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb23-46"><a href="#cb23-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-47"><a href="#cb23-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-48"><a href="#cb23-48" aria-hidden="true" tabindex="-1"></a>I've used Garrick Aden-Buie's <span class="co">[</span><span class="ot">tidyexplain</span><span class="co">](https://www.garrickadenbuie.com/project/tidyexplain/)</span> animations since he first made them in 2018. They're incredibly useful for teaching—being able to see which rows <span class="co">[</span><span class="ot">`left_join()`</span><span class="co">](https://www.garrickadenbuie.com/project/tidyexplain/#left-join)</span> includes when merging two datasets, or <span class="co">[</span><span class="ot">which cells end up where when pivoting longer or pivoting wider</span><span class="co">](https://www.garrickadenbuie.com/project/tidyexplain/#pivot-wider-and-longer)</span> is so valuable. <span class="co">[</span><span class="ot">Check them all out</span><span class="co">](https://www.garrickadenbuie.com/project/tidyexplain/)</span>—they're so fantastic:</span>
+<span id="cb23-49"><a href="#cb23-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-50"><a href="#cb23-50" aria-hidden="true" tabindex="-1"></a><span class="al">![`left_join()` animation by Garrick Aden-Buie](img/left-join.gif)</span>{.center}</span>
+<span id="cb23-51"><a href="#cb23-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-52"><a href="#cb23-52" aria-hidden="true" tabindex="-1"></a>One set of animations that I've always wished existed but doesn't is how {dplyr}'s <span class="in">`mutate()`</span>, <span class="in">`summarize()`</span>, <span class="in">`group_by()`</span>, and <span class="in">`summarize()`</span> work. Unlike other more straightforward {dplyr} functions like <span class="in">`filter()`</span> and <span class="in">`select()`</span>, these mutating/summarizing/grouping functions often involve multiple behind-the-scenes steps that are hard to see. There's even an official term for this kind of workflow: <span class="co">[</span><span class="ot">split/apply/combine</span><span class="co">](https://vita.had.co.nz/papers/plyr.pdf)</span>.</span>
+<span id="cb23-53"><a href="#cb23-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-54"><a href="#cb23-54" aria-hidden="true" tabindex="-1"></a>When I teach about <span class="in">`group_by() |&gt; summarize()`</span>, I end up waving my arms around a lot to explain how <span class="in">`group_by()`</span> puts rows into smaller, invisible datasets behind the scenes. This works, I guess, but I still find that it can be hard for people to conceptualize. It gets even trickier when explaining how {dplyr} keeps some grouping structures intact after summarizing and what exactly <span class="in">`ungroup()`</span> does.</span>
+<span id="cb23-55"><a href="#cb23-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-56"><a href="#cb23-56" aria-hidden="true" tabindex="-1"></a>So, I finally buckled down and made my own tidyexplain-esque animations with Adobe Illustrator and After Effects.^<span class="co">[</span><span class="ot">I tried doing it with R and {gganimate} [like the original tidyexplain animations](https://github.com/gadenbuie/tidyexplain), but it was too hard to do with all the multiple grouping, summarizing, and recombining steps—so these are all artisanally handcrafted animations.</span><span class="co">]</span></span>
+<span id="cb23-57"><a href="#cb23-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-58"><a href="#cb23-58" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip #downloads}</span>
+<span id="cb23-59"><a href="#cb23-59" aria-hidden="true" tabindex="-1"></a><span class="fu">## Downloads</span></span>
+<span id="cb23-60"><a href="#cb23-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-61"><a href="#cb23-61" aria-hidden="true" tabindex="-1"></a>You can download versions of all seven animations here:</span>
+<span id="cb23-62"><a href="#cb23-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-63"><a href="#cb23-63" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`mutate()`</span>: <span class="co">[</span><span class="ot">MP4</span><span class="co">](downloads/Video/grp-mutate.mp4)</span>, <span class="co">[</span><span class="ot">GIF</span><span class="co">](downloads/GIF/grp-mutate.gif)</span>, <span class="co">[</span><span class="ot">static PDF</span><span class="co">](downloads/PDF/grp-mutate.pdf)</span>, <span class="co">[</span><span class="ot">static SVG</span><span class="co">](downloads/SVG/grp-mutate.svg)</span>, <span class="co">[</span><span class="ot">static PNG</span><span class="co">](downloads/PNG/grp-mutate@4x.png)</span></span>
+<span id="cb23-64"><a href="#cb23-64" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`summarize()`</span>: <span class="co">[</span><span class="ot">MP4</span><span class="co">](downloads/Video/grp-summarize-00.mp4)</span>, <span class="co">[</span><span class="ot">GIF</span><span class="co">](downloads/GIF/grp-summarize-00.gif)</span>, <span class="co">[</span><span class="ot">static PDF</span><span class="co">](downloads/PDF/grp-summarize-00.pdf)</span>, <span class="co">[</span><span class="ot">static SVG</span><span class="co">](downloads/SVG/grp-summarize-00.svg)</span>, <span class="co">[</span><span class="ot">static PNG</span><span class="co">](downloads/PNG/grp-summarize-00@4x.png)</span></span>
+<span id="cb23-65"><a href="#cb23-65" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`group_by() |&gt; ungroup()`</span>: <span class="co">[</span><span class="ot">MP4</span><span class="co">](downloads/Video/grp-ungroup.mp4)</span>, <span class="co">[</span><span class="ot">GIF</span><span class="co">](downloads/GIF/grp-ungroup.gif)</span>, <span class="co">[</span><span class="ot">static PDF</span><span class="co">](downloads/PDF/grp-ungroup.pdf)</span>, <span class="co">[</span><span class="ot">static SVG</span><span class="co">](downloads/SVG/grp-ungroup.svg)</span>, <span class="co">[</span><span class="ot">static PNG</span><span class="co">](downloads/PNG/grp-ungroup@4x.png)</span></span>
+<span id="cb23-66"><a href="#cb23-66" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`group_by() |&gt; mutate()`</span>: <span class="co">[</span><span class="ot">MP4</span><span class="co">](downloads/Video/grp-mutate.mp4)</span>, <span class="co">[</span><span class="ot">GIF</span><span class="co">](downloads/GIF/grp-mutate.gif)</span>, <span class="co">[</span><span class="ot">static PDF</span><span class="co">](downloads/PDF/grp-mutate.pdf)</span>, <span class="co">[</span><span class="ot">static SVG</span><span class="co">](downloads/SVG/grp-mutate.svg)</span>, <span class="co">[</span><span class="ot">static PNG</span><span class="co">](downloads/PNG/grp-mutate@4x.png)</span></span>
+<span id="cb23-67"><a href="#cb23-67" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`group_by(cat1) |&gt; summarize()`</span>: <span class="co">[</span><span class="ot">MP4</span><span class="co">](downloads/Video/grp-summarize-01.mp4)</span>, <span class="co">[</span><span class="ot">GIF</span><span class="co">](downloads/GIF/grp-summarize-01.gif)</span>, <span class="co">[</span><span class="ot">static PDF</span><span class="co">](downloads/PDF/grp-summarize-01.pdf)</span>, <span class="co">[</span><span class="ot">static SVG</span><span class="co">](downloads/SVG/grp-summarize-01.svg)</span>, <span class="co">[</span><span class="ot">static PNG</span><span class="co">](downloads/PNG/grp-summarize-01@4x.png)</span></span>
+<span id="cb23-68"><a href="#cb23-68" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`group_by(cat2) |&gt; summarize()`</span>: <span class="co">[</span><span class="ot">MP4</span><span class="co">](downloads/Video/grp-summarize-02.mp4)</span>, <span class="co">[</span><span class="ot">GIF</span><span class="co">](downloads/GIF/grp-summarize-02.gif)</span>, <span class="co">[</span><span class="ot">static PDF</span><span class="co">](downloads/PDF/grp-summarize-02.pdf)</span>, <span class="co">[</span><span class="ot">static SVG</span><span class="co">](downloads/SVG/grp-summarize-02.svg)</span>, <span class="co">[</span><span class="ot">static PNG</span><span class="co">](downloads/PNG/grp-summarize-02@4x.png)</span></span>
+<span id="cb23-69"><a href="#cb23-69" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`group_by(cat1, cat2) |&gt; summarize()`</span>: <span class="co">[</span><span class="ot">MP4</span><span class="co">](downloads/Video/grp-summarize-03.mp4)</span>, <span class="co">[</span><span class="ot">GIF</span><span class="co">](downloads/GIF/grp-summarize-03.gif)</span>, <span class="co">[</span><span class="ot">static PDF</span><span class="co">](downloads/PDF/grp-summarize-03.pdf)</span>, <span class="co">[</span><span class="ot">static SVG</span><span class="co">](downloads/SVG/grp-summarize-03.svg)</span>, <span class="co">[</span><span class="ot">static PNG</span><span class="co">](downloads/PNG/grp-summarize-03@4x.png)</span></span>
+<span id="cb23-70"><a href="#cb23-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-71"><a href="#cb23-71" aria-hidden="true" tabindex="-1"></a>And for fun, here are all the original files:</span>
+<span id="cb23-72"><a href="#cb23-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-73"><a href="#cb23-73" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">Original Illustrator files</span><span class="co">](downloads/illustrator-files.zip)</span></span>
+<span id="cb23-74"><a href="#cb23-74" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">Original After Effects files</span><span class="co">](downloads/group_by-summarize-animations.zip)</span></span>
+<span id="cb23-75"><a href="#cb23-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-76"><a href="#cb23-76" aria-hidden="true" tabindex="-1"></a>They're Creative Commons-licensed—do whatever you want with them!</span>
+<span id="cb23-77"><a href="#cb23-77" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb23-78"><a href="#cb23-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-79"><a href="#cb23-79" aria-hidden="true" tabindex="-1"></a>In this post, we'll use these animations to explain each of these concepts and apply them to data from <span class="co">[</span><span class="ot">{palmerpenguins}</span><span class="co">](https://allisonhorst.github.io/palmerpenguins/)</span>. Let's load some packages and data first:</span>
+<span id="cb23-80"><a href="#cb23-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-83"><a href="#cb23-83" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb23-84"><a href="#cb23-84" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: load-packages-data</span></span>
+<span id="cb23-85"><a href="#cb23-85" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: false</span></span>
+<span id="cb23-86"><a href="#cb23-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-87"><a href="#cb23-87" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb23-88"><a href="#cb23-88" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(palmerpenguins)</span>
+<span id="cb23-89"><a href="#cb23-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-90"><a href="#cb23-90" aria-hidden="true" tabindex="-1"></a>penguins <span class="ot">&lt;-</span> penguins <span class="sc">|&gt;</span> <span class="fu">drop_na</span>()</span>
+<span id="cb23-91"><a href="#cb23-91" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb23-92"><a href="#cb23-92" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-93"><a href="#cb23-93" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-94"><a href="#cb23-94" aria-hidden="true" tabindex="-1"></a><span class="fu"># Adding new columns with `mutate()`</span></span>
+<span id="cb23-95"><a href="#cb23-95" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-96"><a href="#cb23-96" aria-hidden="true" tabindex="-1"></a>The <span class="in">`mutate()`</span> function in {dplyr} adds new columns. It's not destructive—all our existing data will still be there after you add new columns^<span class="co">[</span><span class="ot">Unless we use an existing column name inside `mutate()`, in which case that column will get replaced with the new one.</span><span class="co">]</span></span>
+<span id="cb23-97"><a href="#cb23-97" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-98"><a href="#cb23-98" aria-hidden="true" tabindex="-1"></a>::: {.column-page-inset-right}</span>
+<span id="cb23-99"><a href="#cb23-99" aria-hidden="true" tabindex="-1"></a><span class="in">```{=html}</span></span>
+<span id="cb23-100"><a href="#cb23-100" aria-hidden="true" tabindex="-1"></a><span class="in">&lt;video controls width="100%" style="display: block; margin: auto;"&gt;</span></span>
+<span id="cb23-101"><a href="#cb23-101" aria-hidden="true" tabindex="-1"></a><span class="in">  &lt;source src="downloads/Video/mutate.mp4" type="video/mp4"&gt;</span></span>
+<span id="cb23-102"><a href="#cb23-102" aria-hidden="true" tabindex="-1"></a><span class="in">&lt;/video&gt;</span></span>
+<span id="cb23-103"><a href="#cb23-103" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb23-104"><a href="#cb23-104" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb23-105"><a href="#cb23-105" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-106"><a href="#cb23-106" aria-hidden="true" tabindex="-1"></a>\ </span>
+<span id="cb23-107"><a href="#cb23-107" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-108"><a href="#cb23-108" aria-hidden="true" tabindex="-1"></a>By default, <span class="in">`mutate()`</span> sticks the new column on the far right of the dataset (scroll over to the right to see <span class="in">`body_mass_kg`</span> here):</span>
+<span id="cb23-109"><a href="#cb23-109" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-112"><a href="#cb23-112" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb23-113"><a href="#cb23-113" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: mutate-body-mass-kg</span></span>
+<span id="cb23-114"><a href="#cb23-114" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-115"><a href="#cb23-115" aria-hidden="true" tabindex="-1"></a>penguins <span class="sc">|&gt;</span> </span>
+<span id="cb23-116"><a href="#cb23-116" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">body_mass_kg =</span> body_mass_g <span class="sc">/</span> <span class="dv">1000</span>)</span>
+<span id="cb23-117"><a href="#cb23-117" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb23-118"><a href="#cb23-118" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-119"><a href="#cb23-119" aria-hidden="true" tabindex="-1"></a>We can also control where the new column shows up with either the <span class="in">`.before`</span> or <span class="in">`.after`</span> argument:</span>
+<span id="cb23-120"><a href="#cb23-120" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-123"><a href="#cb23-123" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb23-124"><a href="#cb23-124" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: mutate-body-mass-kg-after</span></span>
+<span id="cb23-125"><a href="#cb23-125" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-126"><a href="#cb23-126" aria-hidden="true" tabindex="-1"></a>penguins <span class="sc">|&gt;</span> </span>
+<span id="cb23-127"><a href="#cb23-127" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb23-128"><a href="#cb23-128" aria-hidden="true" tabindex="-1"></a>    <span class="at">body_mass_kg =</span> body_mass_g <span class="sc">/</span> <span class="dv">1000</span>,</span>
+<span id="cb23-129"><a href="#cb23-129" aria-hidden="true" tabindex="-1"></a>    <span class="at">.after =</span> island</span>
+<span id="cb23-130"><a href="#cb23-130" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb23-131"><a href="#cb23-131" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb23-132"><a href="#cb23-132" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-133"><a href="#cb23-133" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-134"><a href="#cb23-134" aria-hidden="true" tabindex="-1"></a><span class="fu"># Summarizing with `summarize()`</span></span>
+<span id="cb23-135"><a href="#cb23-135" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-136"><a href="#cb23-136" aria-hidden="true" tabindex="-1"></a>The <span class="in">`summarize()`</span> function, on the other hand, *is* destructive. It collapses our dataset into a single value and throws away any columns that we don't use when summarizing.</span>
+<span id="cb23-137"><a href="#cb23-137" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-138"><a href="#cb23-138" aria-hidden="true" tabindex="-1"></a>::: {.column-page-inset-right}</span>
+<span id="cb23-139"><a href="#cb23-139" aria-hidden="true" tabindex="-1"></a><span class="in">```{=html}</span></span>
+<span id="cb23-140"><a href="#cb23-140" aria-hidden="true" tabindex="-1"></a><span class="in">&lt;video controls width="100%" style="display: block; margin: auto;"&gt;</span></span>
+<span id="cb23-141"><a href="#cb23-141" aria-hidden="true" tabindex="-1"></a><span class="in">  &lt;source src="downloads/Video/grp-summarize-00.mp4" type="video/mp4"&gt;</span></span>
+<span id="cb23-142"><a href="#cb23-142" aria-hidden="true" tabindex="-1"></a><span class="in">&lt;/video&gt;</span></span>
+<span id="cb23-143"><a href="#cb23-143" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb23-144"><a href="#cb23-144" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb23-145"><a href="#cb23-145" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-146"><a href="#cb23-146" aria-hidden="true" tabindex="-1"></a>\ </span>
+<span id="cb23-147"><a href="#cb23-147" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-148"><a href="#cb23-148" aria-hidden="true" tabindex="-1"></a>After using <span class="in">`summarize()`</span> on the penguins data, we only see three values in one row: average bill length, total penguin weight, and the number of penguins in the dataset. All other columns are gone.</span>
+<span id="cb23-149"><a href="#cb23-149" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-152"><a href="#cb23-152" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb23-153"><a href="#cb23-153" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: summ-no-group</span></span>
+<span id="cb23-154"><a href="#cb23-154" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-155"><a href="#cb23-155" aria-hidden="true" tabindex="-1"></a>penguins <span class="sc">|&gt;</span> </span>
+<span id="cb23-156"><a href="#cb23-156" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(</span>
+<span id="cb23-157"><a href="#cb23-157" aria-hidden="true" tabindex="-1"></a>    <span class="at">avg_bill_length =</span> <span class="fu">mean</span>(bill_length_mm),</span>
+<span id="cb23-158"><a href="#cb23-158" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_weight =</span> <span class="fu">sum</span>(body_mass_g),</span>
+<span id="cb23-159"><a href="#cb23-159" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_penguins =</span> <span class="fu">n</span>()  <span class="co"># This returns the number of rows in the dataset</span></span>
+<span id="cb23-160"><a href="#cb23-160" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb23-161"><a href="#cb23-161" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb23-162"><a href="#cb23-162" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-163"><a href="#cb23-163" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-164"><a href="#cb23-164" aria-hidden="true" tabindex="-1"></a><span class="fu"># Grouping and ungrouping with `group_by()` and `ungroup()`</span></span>
+<span id="cb23-165"><a href="#cb23-165" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-166"><a href="#cb23-166" aria-hidden="true" tabindex="-1"></a>The <span class="in">`group_by()`</span> function splits a dataset into smaller subsets based on the values of columns that we specify. Importantly, this splitting happens ***behind the scenes***—you don't actually ever see the data split up into smaller datasets.^<span class="co">[</span><span class="ot">I like to imagine that the data is splitting into smaller groups, [Minority Report](https://www.youtube.com/watch?v=NwVBzx0LMNQ)-style, or like [Tony Stark's JARVIS-enabled HUD](https://www.youtube.com/watch?v=E7-o6a0OUHY).</span><span class="co">]</span> To undo the grouping and bring all the rows back together, use <span class="in">`ungroup()`</span>.</span>
+<span id="cb23-167"><a href="#cb23-167" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-168"><a href="#cb23-168" aria-hidden="true" tabindex="-1"></a>::: {.column-page-inset-right}</span>
+<span id="cb23-169"><a href="#cb23-169" aria-hidden="true" tabindex="-1"></a><span class="in">```{=html}</span></span>
+<span id="cb23-170"><a href="#cb23-170" aria-hidden="true" tabindex="-1"></a><span class="in">&lt;video controls width="100%" style="display: block; margin: auto;"&gt;</span></span>
+<span id="cb23-171"><a href="#cb23-171" aria-hidden="true" tabindex="-1"></a><span class="in">  &lt;source src="downloads/Video/grp-ungroup.mp4" type="video/mp4"&gt;</span></span>
+<span id="cb23-172"><a href="#cb23-172" aria-hidden="true" tabindex="-1"></a><span class="in">&lt;/video&gt;</span></span>
+<span id="cb23-173"><a href="#cb23-173" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb23-174"><a href="#cb23-174" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb23-175"><a href="#cb23-175" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-176"><a href="#cb23-176" aria-hidden="true" tabindex="-1"></a>\ </span>
+<span id="cb23-177"><a href="#cb23-177" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-178"><a href="#cb23-178" aria-hidden="true" tabindex="-1"></a>Importantly, grouping doesn't actually change the order of the rows in the dataset. If we use <span class="in">`group_by()`</span> and look at your dataset, it'll still be in the existing order. The only sign that the data is invisibly grouped is a little <span class="in">`Groups: sex [2]`</span> note at the top of the output.</span>
+<span id="cb23-179"><a href="#cb23-179" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-182"><a href="#cb23-182" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb23-183"><a href="#cb23-183" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: grp-only</span></span>
+<span id="cb23-184"><a href="#cb23-184" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-185"><a href="#cb23-185" aria-hidden="true" tabindex="-1"></a>penguins <span class="sc">|&gt;</span> </span>
+<span id="cb23-186"><a href="#cb23-186" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(sex)</span>
+<span id="cb23-187"><a href="#cb23-187" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb23-188"><a href="#cb23-188" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-189"><a href="#cb23-189" aria-hidden="true" tabindex="-1"></a>Grouping is fairly useless on its own, but it becomes really powerful when combined with <span class="in">`mutate()`</span> or <span class="in">`summarize()`</span>.</span>
+<span id="cb23-190"><a href="#cb23-190" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-191"><a href="#cb23-191" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-192"><a href="#cb23-192" aria-hidden="true" tabindex="-1"></a><span class="fu"># Mutating within groups</span></span>
+<span id="cb23-193"><a href="#cb23-193" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-194"><a href="#cb23-194" aria-hidden="true" tabindex="-1"></a>If we use <span class="in">`mutate()`</span> after grouping, new columns are added to each subset separately. In many cases, you won't notice any difference between using <span class="in">`mutate()`</span> on an ungrouped or grouped dataset—you'll get the same values. For instance, if we use <span class="in">`mutate(body_mass_kg = body_mass_g / 1000)`</span> on an ungrouped dataset, R will create a column for the whole dataset that divides <span class="in">`body_mass_g`</span> by 1,000; if we use <span class="in">`mutate(body_mass_kg = body_mass_g / 1000)`</span> on a *grouped* dataset, R will create a new column *within each of the subsets*. Both approaches will generate the same values.^<span class="co">[</span><span class="ot">Using `mutate()` on the grouped dataset will be a tiiiiiny bit slower because it's actually running `mutate()` on each of the groups.</span><span class="co">]</span></span>
+<span id="cb23-195"><a href="#cb23-195" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-196"><a href="#cb23-196" aria-hidden="true" tabindex="-1"></a>This is actually important if we're referencing other values within the group. In the example above, we created a new column <span class="in">`y`</span> that subtracted the smallest value of <span class="in">`x`</span> from each value of <span class="in">`x`</span>. When running <span class="in">`mutate(y = x - min(x))`</span> on the ungrouped dataset, the smallest value of <span class="in">`x`</span> is 1, so all the numbers decrease by 1. When running <span class="in">`mutate(y = x * 2)`</span> on a *grouped* dataset, though, `min(x)` refers to the smallest value of `x` *within each of the subsets*. Check out this example here: the minimum values in groups A, B, and C are 1, 4, and 7 respectively, so in subset A we subtract 1 from all the values of <span class="in">`x`</span>, in subset B we subtract 4 from all the values of <span class="in">`x`</span>, and in subset C we subtract 7 from all the values of <span class="in">`x`</span>. As a result, the new <span class="in">`y`</span> column contains 0, 1, and 2 in each of the groups:</span>
+<span id="cb23-197"><a href="#cb23-197" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-198"><a href="#cb23-198" aria-hidden="true" tabindex="-1"></a>::: {.column-page-inset-right}</span>
+<span id="cb23-199"><a href="#cb23-199" aria-hidden="true" tabindex="-1"></a><span class="in">```{=html}</span></span>
+<span id="cb23-200"><a href="#cb23-200" aria-hidden="true" tabindex="-1"></a><span class="in">&lt;video controls width="100%" style="display: block; margin: auto;"&gt;</span></span>
+<span id="cb23-201"><a href="#cb23-201" aria-hidden="true" tabindex="-1"></a><span class="in">  &lt;source src="downloads/Video/grp-mutate.mp4" type="video/mp4"&gt;</span></span>
+<span id="cb23-202"><a href="#cb23-202" aria-hidden="true" tabindex="-1"></a><span class="in">&lt;/video&gt;</span></span>
+<span id="cb23-203"><a href="#cb23-203" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb23-204"><a href="#cb23-204" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb23-205"><a href="#cb23-205" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-206"><a href="#cb23-206" aria-hidden="true" tabindex="-1"></a>\ </span>
+<span id="cb23-207"><a href="#cb23-207" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-208"><a href="#cb23-208" aria-hidden="true" tabindex="-1"></a>Panel data (or time-series cross-sectional data, like the gapminder dataset) is good example of a situation where grouping and mutating is important. For example, we can use <span class="in">`lag()`</span> to create a new column (<span class="in">`lifeExp_previous`</span>) that shows the previous year's life expectancy.^<span class="co">[</span><span class="ot">This is super common with models where you time-shifted variables, like predicting an outcome based on covariates in the previous year.</span><span class="co">]</span></span>
+<span id="cb23-209"><a href="#cb23-209" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-212"><a href="#cb23-212" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb23-213"><a href="#cb23-213" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: gapminder-bleeding</span></span>
+<span id="cb23-214"><a href="#cb23-214" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-215"><a href="#cb23-215" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gapminder)</span>
+<span id="cb23-216"><a href="#cb23-216" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-217"><a href="#cb23-217" aria-hidden="true" tabindex="-1"></a>gapminder_smaller <span class="ot">&lt;-</span> gapminder <span class="sc">|&gt;</span> </span>
+<span id="cb23-218"><a href="#cb23-218" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(year <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">1997</span>, <span class="dv">2002</span>, <span class="dv">2007</span>))  <span class="co"># Only show a few years</span></span>
+<span id="cb23-219"><a href="#cb23-219" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb23-220"><a href="#cb23-220" aria-hidden="true" tabindex="-1"></a>gapminder_smaller <span class="sc">|&gt;</span> </span>
+<span id="cb23-221"><a href="#cb23-221" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">lifeExp_previous =</span> <span class="fu">lag</span>(lifeExp), <span class="at">.after =</span> lifeExp)</span>
+<span id="cb23-222"><a href="#cb23-222" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb23-223"><a href="#cb23-223" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-224"><a href="#cb23-224" aria-hidden="true" tabindex="-1"></a>Afghanistan in 1997 has a lagged life expectancy of <span class="in">`NA`</span>, but that's fine and to be expected—there's no row for it to look at and copy the value (i.e. there's no Afghanistan 1992 row). Afghanistan's lagged life expectancy in 2002 is the same value as the actual life expectancy in 1997. Great, it worked!^<span class="co">[</span><span class="ot">Technically this isn't a one-year lag; this is a five-year lag, since the data is spaced every 5 years.</span><span class="co">]</span></span>
+<span id="cb23-225"><a href="#cb23-225" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-226"><a href="#cb23-226" aria-hidden="true" tabindex="-1"></a>But look at Albania's lagged life expectancy in 1997—it's 43.84, which is actually Afghanistan's 2007 life expectancy! Lagged values bleed across countries here.</span>
+<span id="cb23-227"><a href="#cb23-227" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-228"><a href="#cb23-228" aria-hidden="true" tabindex="-1"></a>If we group the data by country before lagging, though, the lagging happens *within each of the subsets*, so the first year of every country is missing (since there's no previous year to look at). Now every country's 1997 value is <span class="in">`NA`</span>, since the new column was created separately in each of the smaller behind-the-scenes country-specific datasets:</span>
+<span id="cb23-229"><a href="#cb23-229" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-232"><a href="#cb23-232" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb23-233"><a href="#cb23-233" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: gapminder-no-bleeding</span></span>
+<span id="cb23-234"><a href="#cb23-234" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-235"><a href="#cb23-235" aria-hidden="true" tabindex="-1"></a>gapminder_smaller <span class="sc">|&gt;</span> </span>
+<span id="cb23-236"><a href="#cb23-236" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(country) <span class="sc">|&gt;</span> </span>
+<span id="cb23-237"><a href="#cb23-237" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">lifeExp_previous =</span> <span class="fu">lag</span>(lifeExp), <span class="at">.after =</span> lifeExp)</span>
+<span id="cb23-238"><a href="#cb23-238" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb23-239"><a href="#cb23-239" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-240"><a href="#cb23-240" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-241"><a href="#cb23-241" aria-hidden="true" tabindex="-1"></a><span class="fu"># Summarizing groups with `group_by() |&gt; summarize()`</span></span>
+<span id="cb23-242"><a href="#cb23-242" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-243"><a href="#cb23-243" aria-hidden="true" tabindex="-1"></a>While collapsing an entire dataset can be helpful for finding overall summary statistics (e.g. the average, minimum, and maximum values for columns you're interested in), <span class="in">`summarize()`</span> is better used with groups. If we use <span class="in">`summarize()`</span> on a *grouped* dataset, *each subset is collapsed into a single row*. This will create different summary values, depending on the groups you use. In this example, grouping by <span class="in">`cat1`</span> gives us a summarized dataset with three rows (for <span class="in">`a`</span>, <span class="in">`b`</span>, and <span class="in">`c`</span>):</span>
+<span id="cb23-244"><a href="#cb23-244" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-245"><a href="#cb23-245" aria-hidden="true" tabindex="-1"></a>::: {.column-page-inset-right}</span>
+<span id="cb23-246"><a href="#cb23-246" aria-hidden="true" tabindex="-1"></a><span class="in">```{=html}</span></span>
+<span id="cb23-247"><a href="#cb23-247" aria-hidden="true" tabindex="-1"></a><span class="in">&lt;video controls width="100%" style="display: block; margin: auto;"&gt;</span></span>
+<span id="cb23-248"><a href="#cb23-248" aria-hidden="true" tabindex="-1"></a><span class="in">  &lt;source src="downloads/Video/grp-summarize-01.mp4" type="video/mp4"&gt;</span></span>
+<span id="cb23-249"><a href="#cb23-249" aria-hidden="true" tabindex="-1"></a><span class="in">&lt;/video&gt;</span></span>
+<span id="cb23-250"><a href="#cb23-250" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb23-251"><a href="#cb23-251" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb23-252"><a href="#cb23-252" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-253"><a href="#cb23-253" aria-hidden="true" tabindex="-1"></a>\ </span>
+<span id="cb23-254"><a href="#cb23-254" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-255"><a href="#cb23-255" aria-hidden="true" tabindex="-1"></a>While here, if we group by <span class="in">`cat2`</span>, we get a summarized dataset with two rows (for <span class="in">`j`</span> and <span class="in">`k`</span>):</span>
+<span id="cb23-256"><a href="#cb23-256" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-257"><a href="#cb23-257" aria-hidden="true" tabindex="-1"></a>::: {.column-page-inset-right}</span>
+<span id="cb23-258"><a href="#cb23-258" aria-hidden="true" tabindex="-1"></a><span class="in">```{=html}</span></span>
+<span id="cb23-259"><a href="#cb23-259" aria-hidden="true" tabindex="-1"></a><span class="in">&lt;video controls width="100%" style="display: block; margin: auto;"&gt;</span></span>
+<span id="cb23-260"><a href="#cb23-260" aria-hidden="true" tabindex="-1"></a><span class="in">  &lt;source src="downloads/Video/grp-summarize-02.mp4" type="video/mp4"&gt;</span></span>
+<span id="cb23-261"><a href="#cb23-261" aria-hidden="true" tabindex="-1"></a><span class="in">&lt;/video&gt;</span></span>
+<span id="cb23-262"><a href="#cb23-262" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb23-263"><a href="#cb23-263" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb23-264"><a href="#cb23-264" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-265"><a href="#cb23-265" aria-hidden="true" tabindex="-1"></a>\ </span>
+<span id="cb23-266"><a href="#cb23-266" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-267"><a href="#cb23-267" aria-hidden="true" tabindex="-1"></a>If we use <span class="in">`group_by()`</span> before summarizing the penguins data, we'll get a column for the group, along with average bill length, total penguin weight, and the number of penguins *in each group*. As before, all other columns are gone.</span>
+<span id="cb23-268"><a href="#cb23-268" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-269"><a href="#cb23-269" aria-hidden="true" tabindex="-1"></a>We can see summarized values by species:</span>
+<span id="cb23-270"><a href="#cb23-270" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-273"><a href="#cb23-273" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb23-274"><a href="#cb23-274" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: summ-species-full</span></span>
+<span id="cb23-275"><a href="#cb23-275" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-276"><a href="#cb23-276" aria-hidden="true" tabindex="-1"></a>penguins <span class="sc">|&gt;</span> </span>
+<span id="cb23-277"><a href="#cb23-277" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(species) <span class="sc">|&gt;</span> </span>
+<span id="cb23-278"><a href="#cb23-278" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(</span>
+<span id="cb23-279"><a href="#cb23-279" aria-hidden="true" tabindex="-1"></a>    <span class="at">avg_bill_length =</span> <span class="fu">mean</span>(bill_length_mm),</span>
+<span id="cb23-280"><a href="#cb23-280" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_weight =</span> <span class="fu">sum</span>(body_mass_g),</span>
+<span id="cb23-281"><a href="#cb23-281" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_penguins =</span> <span class="fu">n</span>()  <span class="co"># This returns the number of rows in each group</span></span>
+<span id="cb23-282"><a href="#cb23-282" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb23-283"><a href="#cb23-283" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb23-284"><a href="#cb23-284" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-285"><a href="#cb23-285" aria-hidden="true" tabindex="-1"></a>…or by sex…</span>
+<span id="cb23-286"><a href="#cb23-286" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-289"><a href="#cb23-289" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb23-290"><a href="#cb23-290" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: summ-sex-full</span></span>
+<span id="cb23-291"><a href="#cb23-291" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-292"><a href="#cb23-292" aria-hidden="true" tabindex="-1"></a>penguins <span class="sc">|&gt;</span> </span>
+<span id="cb23-293"><a href="#cb23-293" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(sex) <span class="sc">|&gt;</span> </span>
+<span id="cb23-294"><a href="#cb23-294" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(</span>
+<span id="cb23-295"><a href="#cb23-295" aria-hidden="true" tabindex="-1"></a>    <span class="at">avg_bill_length =</span> <span class="fu">mean</span>(bill_length_mm),</span>
+<span id="cb23-296"><a href="#cb23-296" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_weight =</span> <span class="fu">sum</span>(body_mass_g),</span>
+<span id="cb23-297"><a href="#cb23-297" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_penguins =</span> <span class="fu">n</span>()</span>
+<span id="cb23-298"><a href="#cb23-298" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb23-299"><a href="#cb23-299" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb23-300"><a href="#cb23-300" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-301"><a href="#cb23-301" aria-hidden="true" tabindex="-1"></a>…or by any other column.</span>
+<span id="cb23-302"><a href="#cb23-302" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-303"><a href="#cb23-303" aria-hidden="true" tabindex="-1"></a>::: {.callout-caution}</span>
+<span id="cb23-304"><a href="#cb23-304" aria-hidden="true" tabindex="-1"></a><span class="fu">### Grouping by numeric columns</span></span>
+<span id="cb23-305"><a href="#cb23-305" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-306"><a href="#cb23-306" aria-hidden="true" tabindex="-1"></a>One common mistake is to feed a numeric columns into <span class="in">`group_by()`</span>, like this:</span>
+<span id="cb23-307"><a href="#cb23-307" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-310"><a href="#cb23-310" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb23-311"><a href="#cb23-311" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: summ-bad-group</span></span>
+<span id="cb23-312"><a href="#cb23-312" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-313"><a href="#cb23-313" aria-hidden="true" tabindex="-1"></a>penguins <span class="sc">|&gt;</span> </span>
+<span id="cb23-314"><a href="#cb23-314" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(flipper_length_mm) <span class="sc">|&gt;</span> </span>
+<span id="cb23-315"><a href="#cb23-315" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(</span>
+<span id="cb23-316"><a href="#cb23-316" aria-hidden="true" tabindex="-1"></a>    <span class="at">avg_bill_length =</span> <span class="fu">mean</span>(bill_length_mm),</span>
+<span id="cb23-317"><a href="#cb23-317" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_weight =</span> <span class="fu">sum</span>(body_mass_g),</span>
+<span id="cb23-318"><a href="#cb23-318" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_penguins =</span> <span class="fu">n</span>()</span>
+<span id="cb23-319"><a href="#cb23-319" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb23-320"><a href="#cb23-320" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb23-321"><a href="#cb23-321" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-322"><a href="#cb23-322" aria-hidden="true" tabindex="-1"></a>This technically calculates *something*, but it's generally not what you're looking for. R is making groups for each of the unique values of flipper length and then calculating summaries for those groups. There's only one penguin with a flipper length of 172 mm; there are 7 with 181 mm. Grouping by a numeric variable can be useful if you want to create a histogram-like table of counts of unique values, but most of the time, you don't want to do this.</span>
+<span id="cb23-323"><a href="#cb23-323" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-324"><a href="#cb23-324" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb23-325"><a href="#cb23-325" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-326"><a href="#cb23-326" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-327"><a href="#cb23-327" aria-hidden="true" tabindex="-1"></a><span class="fu"># Summarizing multiple groups</span></span>
+<span id="cb23-328"><a href="#cb23-328" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-329"><a href="#cb23-329" aria-hidden="true" tabindex="-1"></a>We can specify more than one group with <span class="in">`group_by()`</span>, which will create behind-the-scenes datasets for each unique combination of values in the groups. Here, when group by both <span class="in">`cat1`</span> and <span class="in">`cat2`</span>, we get six groups (<span class="in">`a &amp; j`</span>, <span class="in">`a &amp; k`</span>, <span class="in">`b &amp; j`</span>, <span class="in">`b &amp; k`</span>, <span class="in">`c &amp; j`</span>, <span class="in">`c &amp; k`</span>), which we can then use with <span class="in">`mutate()`</span> or <span class="in">`summarize()`</span>:</span>
+<span id="cb23-330"><a href="#cb23-330" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-331"><a href="#cb23-331" aria-hidden="true" tabindex="-1"></a>::: {.column-page-inset-right}</span>
+<span id="cb23-332"><a href="#cb23-332" aria-hidden="true" tabindex="-1"></a><span class="in">```{=html}</span></span>
+<span id="cb23-333"><a href="#cb23-333" aria-hidden="true" tabindex="-1"></a><span class="in">&lt;video controls width="100%" style="display: block; margin: auto;"&gt;</span></span>
+<span id="cb23-334"><a href="#cb23-334" aria-hidden="true" tabindex="-1"></a><span class="in">  &lt;source src="downloads/Video/grp-summarize-03.mp4" type="video/mp4"&gt;</span></span>
+<span id="cb23-335"><a href="#cb23-335" aria-hidden="true" tabindex="-1"></a><span class="in">&lt;/video&gt;</span></span>
+<span id="cb23-336"><a href="#cb23-336" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb23-337"><a href="#cb23-337" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb23-338"><a href="#cb23-338" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-339"><a href="#cb23-339" aria-hidden="true" tabindex="-1"></a>\ </span>
+<span id="cb23-340"><a href="#cb23-340" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-341"><a href="#cb23-341" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-342"><a href="#cb23-342" aria-hidden="true" tabindex="-1"></a><span class="fu"># Leftover groupings and `ungroup()`</span></span>
+<span id="cb23-343"><a href="#cb23-343" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-344"><a href="#cb23-344" aria-hidden="true" tabindex="-1"></a>Some subtle and interesting things happen when summarizing with multiple groups, though, and they throw people off all the time.</span>
+<span id="cb23-345"><a href="#cb23-345" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-346"><a href="#cb23-346" aria-hidden="true" tabindex="-1"></a>When you use <span class="in">`summarize()`</span> on a grouped dataset, **{dplyr} will automatically ungroup the last of the groups**. This happens invisibly when you're only grouping by one thing. For example, this has three rows, and no <span class="in">`Groups: species[3]`</span> note at the top:</span>
+<span id="cb23-347"><a href="#cb23-347" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-350"><a href="#cb23-350" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb23-351"><a href="#cb23-351" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: summ-species</span></span>
+<span id="cb23-352"><a href="#cb23-352" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-353"><a href="#cb23-353" aria-hidden="true" tabindex="-1"></a>penguins <span class="sc">|&gt;</span> </span>
+<span id="cb23-354"><a href="#cb23-354" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(species) <span class="sc">|&gt;</span> </span>
+<span id="cb23-355"><a href="#cb23-355" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">total =</span> <span class="fu">n</span>())</span>
+<span id="cb23-356"><a href="#cb23-356" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb23-357"><a href="#cb23-357" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-358"><a href="#cb23-358" aria-hidden="true" tabindex="-1"></a>When grouping by multiple things, {dplyr} will automatically ungroup the last of the groups (i.e. the right-most group), but keep everything else grouped. This has six rows and is grouped by species (hence the <span class="in">`Groups: species [3]`</span>), and R gives you an extra message alerting you to the fact that it's still grouped by something: `<span class="in">` `</span>summarise()` has grouped output by 'species'.``</span>
+<span id="cb23-359"><a href="#cb23-359" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-362"><a href="#cb23-362" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb23-363"><a href="#cb23-363" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: summ-species-sex</span></span>
+<span id="cb23-364"><a href="#cb23-364" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-365"><a href="#cb23-365" aria-hidden="true" tabindex="-1"></a>penguins <span class="sc">|&gt;</span> </span>
+<span id="cb23-366"><a href="#cb23-366" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(species, sex) <span class="sc">|&gt;</span> </span>
+<span id="cb23-367"><a href="#cb23-367" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">total =</span> <span class="fu">n</span>())</span>
+<span id="cb23-368"><a href="#cb23-368" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb23-369"><a href="#cb23-369" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-370"><a href="#cb23-370" aria-hidden="true" tabindex="-1"></a>The same thing happens in reverse if we switch species and sex. The results here are still grouped by sex:</span>
+<span id="cb23-371"><a href="#cb23-371" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-374"><a href="#cb23-374" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb23-375"><a href="#cb23-375" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: summ-sex-species</span></span>
+<span id="cb23-376"><a href="#cb23-376" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-377"><a href="#cb23-377" aria-hidden="true" tabindex="-1"></a>penguins <span class="sc">|&gt;</span> </span>
+<span id="cb23-378"><a href="#cb23-378" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(sex, species) <span class="sc">|&gt;</span> </span>
+<span id="cb23-379"><a href="#cb23-379" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">total =</span> <span class="fu">n</span>())</span>
+<span id="cb23-380"><a href="#cb23-380" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb23-381"><a href="#cb23-381" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-382"><a href="#cb23-382" aria-hidden="true" tabindex="-1"></a>We can use <span class="in">`ungroup()`</span> to bring the data all the way back together and get rid of the groups:</span>
+<span id="cb23-383"><a href="#cb23-383" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-386"><a href="#cb23-386" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb23-387"><a href="#cb23-387" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: summ-species-sex-ungroup</span></span>
+<span id="cb23-388"><a href="#cb23-388" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-389"><a href="#cb23-389" aria-hidden="true" tabindex="-1"></a>penguins <span class="sc">|&gt;</span> </span>
+<span id="cb23-390"><a href="#cb23-390" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(species, sex) <span class="sc">|&gt;</span> </span>
+<span id="cb23-391"><a href="#cb23-391" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">total =</span> <span class="fu">n</span>()) <span class="sc">|&gt;</span> </span>
+<span id="cb23-392"><a href="#cb23-392" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb23-393"><a href="#cb23-393" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb23-394"><a href="#cb23-394" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-395"><a href="#cb23-395" aria-hidden="true" tabindex="-1"></a>Alternatively, <span class="in">`summarize`</span> has a <span class="in">`.groups`</span> argument that you can use to control what happens to the groups after you summarize. By default, it uses <span class="in">`.groups = "drop_last"`</span> and gets rid of the right-most group, but you can also drop all the groups (<span class="in">`.groups = "drop"`</span>) and keep all the groups (<span class="in">`.groups = "keep"`</span>). See? No groups!</span>
+<span id="cb23-396"><a href="#cb23-396" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-399"><a href="#cb23-399" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb23-400"><a href="#cb23-400" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: summ-species-sex-drop</span></span>
+<span id="cb23-401"><a href="#cb23-401" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-402"><a href="#cb23-402" aria-hidden="true" tabindex="-1"></a>penguins <span class="sc">|&gt;</span> </span>
+<span id="cb23-403"><a href="#cb23-403" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(species, sex) <span class="sc">|&gt;</span> </span>
+<span id="cb23-404"><a href="#cb23-404" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">total =</span> <span class="fu">n</span>(), <span class="at">.groups =</span> <span class="st">"drop"</span>)</span>
+<span id="cb23-405"><a href="#cb23-405" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb23-406"><a href="#cb23-406" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-407"><a href="#cb23-407" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip}</span>
+<span id="cb23-408"><a href="#cb23-408" aria-hidden="true" tabindex="-1"></a><span class="fu">## Experimental different way of grouping and summarizing</span></span>
+<span id="cb23-409"><a href="#cb23-409" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-410"><a href="#cb23-410" aria-hidden="true" tabindex="-1"></a>With newer versions of {dplyr} there's a new experimental way to specify groups when summarizing, borrowed from <span class="co">[</span><span class="ot">{data.table}</span><span class="co">](https://rdatatable.gitlab.io/data.table/)</span>. Rather than specify groups in an explicit <span class="in">`group_by()`</span> function, you can do it inside <span class="in">`summarize()`</span> with the <span class="in">`.by`</span> argument:</span>
+<span id="cb23-411"><a href="#cb23-411" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-414"><a href="#cb23-414" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb23-415"><a href="#cb23-415" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: summ-species-sex-by</span></span>
+<span id="cb23-416"><a href="#cb23-416" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-417"><a href="#cb23-417" aria-hidden="true" tabindex="-1"></a>penguins <span class="sc">|&gt;</span> </span>
+<span id="cb23-418"><a href="#cb23-418" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">total =</span> <span class="fu">n</span>(), <span class="at">.by =</span> <span class="fu">c</span>(species, sex))</span>
+<span id="cb23-419"><a href="#cb23-419" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb23-420"><a href="#cb23-420" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-421"><a href="#cb23-421" aria-hidden="true" tabindex="-1"></a>This automatically ungroups everything when it's done, so you don't have any leftover groupings.</span>
+<span id="cb23-422"><a href="#cb23-422" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-423"><a href="#cb23-423" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb23-424"><a href="#cb23-424" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-425"><a href="#cb23-425" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-426"><a href="#cb23-426" aria-hidden="true" tabindex="-1"></a><span class="fu"># Why care about leftover groups?</span></span>
+<span id="cb23-427"><a href="#cb23-427" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-428"><a href="#cb23-428" aria-hidden="true" tabindex="-1"></a>Lots of the time, you don't actually need to worry about leftover groupings. If you're plotting or modeling or doing other stuff with the data, those functions will ignore the groups and work on the whole dataset. For example, I do stuff like calculating and plotting group summaries all the time—<span class="in">`plot_data`</span> here is still grouped by <span class="in">`species`</span> after summarizing, but <span class="in">`ggplot()`</span> doesn't care:</span>
+<span id="cb23-429"><a href="#cb23-429" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-432"><a href="#cb23-432" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb23-433"><a href="#cb23-433" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: plot-grouped-data</span></span>
+<span id="cb23-434"><a href="#cb23-434" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-435"><a href="#cb23-435" aria-hidden="true" tabindex="-1"></a>plot_data <span class="ot">&lt;-</span> penguins <span class="sc">|&gt;</span> </span>
+<span id="cb23-436"><a href="#cb23-436" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(species, sex) <span class="sc">|&gt;</span> </span>
+<span id="cb23-437"><a href="#cb23-437" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">total =</span> <span class="fu">n</span>())</span>
+<span id="cb23-438"><a href="#cb23-438" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-439"><a href="#cb23-439" aria-hidden="true" tabindex="-1"></a><span class="co"># plot_data is grouped by sex, but that doesn't matter here</span></span>
+<span id="cb23-440"><a href="#cb23-440" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(plot_data, <span class="fu">aes</span>(<span class="at">x =</span> species, <span class="at">y =</span> total, <span class="at">fill =</span> species)) <span class="sc">+</span></span>
+<span id="cb23-441"><a href="#cb23-441" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span> </span>
+<span id="cb23-442"><a href="#cb23-442" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(<span class="at">fill =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
+<span id="cb23-443"><a href="#cb23-443" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="fu">vars</span>(sex))</span>
+<span id="cb23-444"><a href="#cb23-444" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb23-445"><a href="#cb23-445" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-446"><a href="#cb23-446" aria-hidden="true" tabindex="-1"></a>Leftover groups are ***very important*** when you use things like <span class="in">`mutate()`</span> on the summarized dataset.</span>
+<span id="cb23-447"><a href="#cb23-447" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-448"><a href="#cb23-448" aria-hidden="true" tabindex="-1"></a>Like here, we'll create a proportion column based on <span class="in">`total / sum(total)`</span>. Because we only grouped by one thing, there are no leftover groupings, so the <span class="in">`prop`</span> column adds up to 100%:</span>
+<span id="cb23-449"><a href="#cb23-449" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-452"><a href="#cb23-452" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb23-453"><a href="#cb23-453" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: summ-species-prop</span></span>
+<span id="cb23-454"><a href="#cb23-454" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-455"><a href="#cb23-455" aria-hidden="true" tabindex="-1"></a>penguins <span class="sc">|&gt;</span> </span>
+<span id="cb23-456"><a href="#cb23-456" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(species) <span class="sc">|&gt;</span> </span>
+<span id="cb23-457"><a href="#cb23-457" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">total =</span> <span class="fu">n</span>()) <span class="sc">|&gt;</span> </span>
+<span id="cb23-458"><a href="#cb23-458" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">prop =</span> total <span class="sc">/</span> <span class="fu">sum</span>(total))</span>
+<span id="cb23-459"><a href="#cb23-459" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb23-460"><a href="#cb23-460" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-461"><a href="#cb23-461" aria-hidden="true" tabindex="-1"></a>Next, we'll group by two things, which creates behind-the-scenes datasets for all the six combinations of species and sex. When {dplyr} is done, it ungroups the sex group, but leaves the dataset grouped by species. The <span class="in">`prop`</span> column no longer adds up to 100%; it adds to 300%. That's because it calculated <span class="in">`total/sum(total)`</span> *within* each species group (so 50% of Adélies are female, 50% are male, etc.)</span>
+<span id="cb23-462"><a href="#cb23-462" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-465"><a href="#cb23-465" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb23-466"><a href="#cb23-466" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: summ-species-sex-prop</span></span>
+<span id="cb23-467"><a href="#cb23-467" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-468"><a href="#cb23-468" aria-hidden="true" tabindex="-1"></a>penguins <span class="sc">|&gt;</span> </span>
+<span id="cb23-469"><a href="#cb23-469" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(species, sex) <span class="sc">|&gt;</span> </span>
+<span id="cb23-470"><a href="#cb23-470" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">total =</span> <span class="fu">n</span>()) <span class="sc">|&gt;</span> </span>
+<span id="cb23-471"><a href="#cb23-471" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">prop =</span> total <span class="sc">/</span> <span class="fu">sum</span>(total))</span>
+<span id="cb23-472"><a href="#cb23-472" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb23-473"><a href="#cb23-473" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-474"><a href="#cb23-474" aria-hidden="true" tabindex="-1"></a>If we reverse the grouping order so that sex comes first, {dplyr} will automatically stop grouping by species and keep the dataset grouped by sex. That means <span class="in">`mutate()`</span> will work *within* each sex group, so the <span class="in">`prop`</span> column here adds to 200%. 44% of female penguins are Adélies, 21% of female penguins are Chinstraps, and 35% of female penguins are Gentoos, and so on.</span>
+<span id="cb23-475"><a href="#cb23-475" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-478"><a href="#cb23-478" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb23-479"><a href="#cb23-479" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: summ-sex-species-prop</span></span>
+<span id="cb23-480"><a href="#cb23-480" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-481"><a href="#cb23-481" aria-hidden="true" tabindex="-1"></a>penguins <span class="sc">|&gt;</span> </span>
+<span id="cb23-482"><a href="#cb23-482" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(sex, species) <span class="sc">|&gt;</span> </span>
+<span id="cb23-483"><a href="#cb23-483" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">total =</span> <span class="fu">n</span>()) <span class="sc">|&gt;</span> </span>
+<span id="cb23-484"><a href="#cb23-484" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">prop =</span> total <span class="sc">/</span> <span class="fu">sum</span>(total))</span>
+<span id="cb23-485"><a href="#cb23-485" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb23-486"><a href="#cb23-486" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-487"><a href="#cb23-487" aria-hidden="true" tabindex="-1"></a>If we explicitly ungroup before calculating the proportion,^<span class="co">[</span><span class="ot">Or use the `.groups` argument or `.by` argument in `summarize()`</span><span class="co">]</span> then <span class="in">`mutate()`</span> will work on the whole dataset instead of sex- or species-specific groups. Here, 22% of all penguins are female Adélies, 10% are female Chinstraps, etc.</span>
+<span id="cb23-488"><a href="#cb23-488" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-491"><a href="#cb23-491" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb23-492"><a href="#cb23-492" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: summ-sex-species-prop-ungroup</span></span>
+<span id="cb23-493"><a href="#cb23-493" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-494"><a href="#cb23-494" aria-hidden="true" tabindex="-1"></a>penguins <span class="sc">|&gt;</span> </span>
+<span id="cb23-495"><a href="#cb23-495" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(sex, species) <span class="sc">|&gt;</span> </span>
+<span id="cb23-496"><a href="#cb23-496" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">total =</span> <span class="fu">n</span>()) <span class="sc">|&gt;</span> </span>
+<span id="cb23-497"><a href="#cb23-497" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb23-498"><a href="#cb23-498" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">prop =</span> total <span class="sc">/</span> <span class="fu">sum</span>(total))</span>
+<span id="cb23-499"><a href="#cb23-499" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb23-500"><a href="#cb23-500" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-501"><a href="#cb23-501" aria-hidden="true" tabindex="-1"></a>We don't have to rely on {dplyr}'s automatic ungroup-the-last-grouping feature and we can add our own grouping explicitly later. Like here, {dplyr} stops grouping by sex, which means that the <span class="in">`prop`</span> column would add to 300%, showing the proportion of sexes within each species. But if we throw in a <span class="in">`group_by(sex)`</span> before <span class="in">`mutate()`</span>, it'll put everything in two behind-the-scenes datasets (male and female) and calculate the proportion of species within each sex. The resulting dataset is still grouped by sex, since <span class="in">`mutate()`</span> doesn't drop any groups like <span class="in">`summarize()`</span>:</span>
+<span id="cb23-502"><a href="#cb23-502" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-505"><a href="#cb23-505" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb23-506"><a href="#cb23-506" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: summ-species-sex-prop-sex</span></span>
+<span id="cb23-507"><a href="#cb23-507" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-508"><a href="#cb23-508" aria-hidden="true" tabindex="-1"></a>penguins <span class="sc">|&gt;</span> </span>
+<span id="cb23-509"><a href="#cb23-509" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(species, sex) <span class="sc">|&gt;</span> </span>
+<span id="cb23-510"><a href="#cb23-510" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">total =</span> <span class="fu">n</span>()) <span class="sc">|&gt;</span> </span>
+<span id="cb23-511"><a href="#cb23-511" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(sex) <span class="sc">|&gt;</span></span>
+<span id="cb23-512"><a href="#cb23-512" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">prop =</span> total <span class="sc">/</span> <span class="fu">sum</span>(total))</span>
+<span id="cb23-513"><a href="#cb23-513" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb23-514"><a href="#cb23-514" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-515"><a href="#cb23-515" aria-hidden="true" tabindex="-1"></a><span class="in">```{r eval=FALSE, include=FALSE}</span></span>
+<span id="cb23-516"><a href="#cb23-516" aria-hidden="true" tabindex="-1"></a><span class="in">#| label: stuff-for-animation</span></span>
+<span id="cb23-517"><a href="#cb23-517" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-518"><a href="#cb23-518" aria-hidden="true" tabindex="-1"></a><span class="in">library(tidyverse)</span></span>
+<span id="cb23-519"><a href="#cb23-519" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-520"><a href="#cb23-520" aria-hidden="true" tabindex="-1"></a><span class="in">ungrouped &lt;- tribble(</span></span>
+<span id="cb23-521"><a href="#cb23-521" aria-hidden="true" tabindex="-1"></a><span class="in">  ~cat1, ~cat2, ~x,</span></span>
+<span id="cb23-522"><a href="#cb23-522" aria-hidden="true" tabindex="-1"></a><span class="in">  "a",   "x",   1,</span></span>
+<span id="cb23-523"><a href="#cb23-523" aria-hidden="true" tabindex="-1"></a><span class="in">  "a",   "x",   2,</span></span>
+<span id="cb23-524"><a href="#cb23-524" aria-hidden="true" tabindex="-1"></a><span class="in">  "a",   "y",   3,</span></span>
+<span id="cb23-525"><a href="#cb23-525" aria-hidden="true" tabindex="-1"></a><span class="in">  "b",   "x",   4,</span></span>
+<span id="cb23-526"><a href="#cb23-526" aria-hidden="true" tabindex="-1"></a><span class="in">  "b",   "y",   5,</span></span>
+<span id="cb23-527"><a href="#cb23-527" aria-hidden="true" tabindex="-1"></a><span class="in">  "b",   "y",   6,</span></span>
+<span id="cb23-528"><a href="#cb23-528" aria-hidden="true" tabindex="-1"></a><span class="in">  "c",   "x",   7,</span></span>
+<span id="cb23-529"><a href="#cb23-529" aria-hidden="true" tabindex="-1"></a><span class="in">  "c",   "x",   8,</span></span>
+<span id="cb23-530"><a href="#cb23-530" aria-hidden="true" tabindex="-1"></a><span class="in">  "c",   "y",   9</span></span>
+<span id="cb23-531"><a href="#cb23-531" aria-hidden="true" tabindex="-1"></a><span class="in">)</span></span>
+<span id="cb23-532"><a href="#cb23-532" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-533"><a href="#cb23-533" aria-hidden="true" tabindex="-1"></a><span class="in">ungrouped |&gt; </span></span>
+<span id="cb23-534"><a href="#cb23-534" aria-hidden="true" tabindex="-1"></a><span class="in">  summarize(avg = mean(x), total = sum(x), n = n())</span></span>
+<span id="cb23-535"><a href="#cb23-535" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-536"><a href="#cb23-536" aria-hidden="true" tabindex="-1"></a><span class="in">ungrouped |&gt; </span></span>
+<span id="cb23-537"><a href="#cb23-537" aria-hidden="true" tabindex="-1"></a><span class="in">  group_by(cat1, cat2) |&gt; </span></span>
+<span id="cb23-538"><a href="#cb23-538" aria-hidden="true" tabindex="-1"></a><span class="in">  summarize(avg = mean(x), total = sum(x), n = n()) |&gt; </span></span>
+<span id="cb23-539"><a href="#cb23-539" aria-hidden="true" tabindex="-1"></a><span class="in">  mutate(prop = n / sum(n))</span></span>
+<span id="cb23-540"><a href="#cb23-540" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+</code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+<footer class="footer"><div class="nav-footer">
+    <div class="nav-footer-left">
+<p><span class="faux-block"><i class="fa-brands fa-creative-commons" aria-label="creative-commons"></i> 2007–2024 Andrew Heiss</span> <span class="faux-block">All content licensed under<br><a href="https://creativecommons.org/licenses/by/4.0/"><i class="fa-brands fa-creative-commons" aria-label="creative-commons"></i> <i class="fa-brands fa-creative-commons-by" aria-label="creative-commons-by"></i> Creative Commons CC BY 4.0</a></span></p>
+</div>   
+    <div class="nav-footer-center">
+<p><span class="faux-block"><i class="fa-brands fa-orcid" aria-label="orcid"></i> <strong>ORCID</strong> <a href="https://orcid.org/0000-0002-3948-3914">0000-0002-3948-3914</a></span> <span class="faux-block"><i class="fa-solid fa-key" aria-label="key"></i> <a href="../../../../../pgp_ath.asc.txt">PGP public key</a>   <i class="fa-solid fa-fingerprint" aria-label="fingerprint"></i> Fingerprint:<br><span class="fingerprint">4AA2 FA83 A8B2 05A4 E30F<br> 610D 1382 6216 9178 36AB</span></span></p>
+</div>
+    <div class="nav-footer-right">
+<p><span class="faux-block">Made with <i class="fa-brands fa-r-project" aria-label="r-project"></i> and <a href="https://quarto.org/">Quarto</a></span> <span class="faux-block"><a href="https://github.com/andrewheiss/ath-quarto">View the source at <i class="fa-brands fa-github" aria-label="github"></i> GitHub</a></span></p>
+</div>
+  </div>
+</footer>
+
+
+</body></html>
