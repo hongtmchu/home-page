@@ -2,8 +2,8 @@
 title: "Hello there!"
 pagetitle: "Hong T.M. Chu"
 description-meta: "Hong T.M. Chu is an Assistant Professor at VinUniversity."
-main-photo: /files/profiles/andrew-heiss-2022.jpg
-main-photo-square: /files/profiles/andrew-heiss-2022-square.jpg
+main-photo: /files/profiles/profile-photo.jpg
+main-photo-square: /files/profiles/profile-photo.jpg
 title-block-banner: "#CF4446"
 format:
   html:
